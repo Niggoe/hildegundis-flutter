@@ -4,6 +4,7 @@ import "dart:convert";
 import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'addStrafeDialog.dart';
 
 class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
@@ -13,6 +14,7 @@ const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
 
 class BookViewState extends State<BookView> {
   List data = new List();
+  List _items = [];
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/accountings");
@@ -57,7 +59,7 @@ class BookViewState extends State<BookView> {
             addEventPressed();
           },
           tooltip: "Termin hinzufügen",
-          child: new Icon(Icons.delete),
+          child: new Icon(Icons.add),
         ),
         body: new ListView.builder(
             padding: const EdgeInsets.all(16.0),
@@ -75,9 +77,19 @@ class BookViewState extends State<BookView> {
     print("User: ${user.uid} wants to read");
     if (!allowedUsers.contains(user_id)) {
       final snackBar = new SnackBar(
-        content: new Text("Leider darfst du nichts hinzufügen"),
+        content: new Text("Leider darfst du keine Strafen hinzufügen"),
       );
       Scaffold.of(context).showSnackBar(snackBar);
-    } 
+    } else {
+      ModelData data =
+          await Navigator.of(context).push(new MaterialPageRoute<ModelData>(
+              builder: (BuildContext context) {
+                return new DialogAddStrafe();
+              },
+              fullscreenDialog: true));
+      setState(() {
+        _items.add(data);
+      });
+    }
   }
 }
