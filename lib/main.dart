@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'routes.dart';
+import 'login.dart';
+import 'homescreen.dart';
 
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
+  final routes = <String, WidgetBuilder>{
+    LoginPage.tag: (context) => LoginPage(),
+    HomePage.tag: (context) => HomePage()
+  };
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -13,6 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: routes,
+      home: LoginPage(),
     );
   }
 }

@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'homescreen.dart';
 
 class LoginPage extends StatefulWidget {
+  static String tag = 'login-page';
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
 }
@@ -34,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
           FirebaseUser user = await FirebaseAuth.instance
               .signInWithEmailAndPassword(email: _email, password: _password);
           print("Signed in: ${user.uid}");
+          Navigator.of(context).pushReplacementNamed(HomePage.tag);
         } else {
           FirebaseUser user = await FirebaseAuth.instance
               .createUserWithEmailAndPassword(
@@ -64,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Login Screen"),
+        title: new Text("Login Hildegundis APP"),
       ),
       body: new Container(
           padding: EdgeInsets.all(16.0),
@@ -116,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
         new RaisedButton(
           onPressed: validateAndSubmit,
           child: new Text(
-            'Create an Account',
+            'Register',
             style: new TextStyle(fontSize: 20.0),
           ),
         ),

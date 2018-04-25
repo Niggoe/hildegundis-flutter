@@ -9,7 +9,7 @@ class CalendarView extends StatefulWidget {
 }
 
 class CalendarViewState extends State<CalendarView> {
-  List data;
+  List data = new List();
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/dates");

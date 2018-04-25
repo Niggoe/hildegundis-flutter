@@ -9,10 +9,10 @@ class BookView extends StatefulWidget {
 }
 
 class BookViewState extends State<BookView> {
-  List data;
+  List data = new List();
 
   Future<String> fetchPost() async {
-    var response = await http.get("https://www.hildegundisapp.de/dates");
+    var response = await http.get("https://www.hildegundisapp.de/accountings");
 
     this.setState(() {
       Map<String, dynamic> user = json.decode(response.body);
@@ -28,15 +28,20 @@ class BookViewState extends State<BookView> {
   }
 
   Widget buildRow(data) {
-    var parsedDate = DateTime.parse(data["startdate"]);
-    var formatter = new DateFormat("dd.MM.yyyy H:m");
-    var dateString = formatter.format(parsedDate);
+    var date = data["date"];
+
+    //var parsedDate = DateTime.parse(date);
+    //var formatter = new DateFormat("dd.MM.yyyy HH:mm");
+    //var dateString = formatter.format(parsedDate);
 
     return new ListTile(
       title: new Text(data["name"]),
-      subtitle: new Text(
-          dateString + "\n\n" + data["location"] + " - " + data["clothes"]),
-      leading: new Icon(Icons.event),
+      subtitle: new Text(date +
+          "\n\n Grund: " +
+          data["grund"] +
+          " - Betrag: " +
+          data["betrag"].toString()),
+      leading: new Icon(Icons.monetization_on),
     );
   }
 

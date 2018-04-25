@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'DateView.dart';
 import 'spiessbuch.dart';
-import 'login.dart';
 
 void main() => runApp(new MaterialApp(home: new HomePage()));
 
 class HomePage extends StatefulWidget {
+  static String tag = 'home-page';
   @override
   HomePageState createState() => new HomePageState();
 }
@@ -34,7 +34,7 @@ class HomePageState extends State<HomePage>
         title: new Text("Hildegundis APP"),
         backgroundColor: Colors.blue,
         actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.list), onPressed: _pushSaved),
+          new IconButton(icon: new Icon(Icons.lock_open), onPressed: _pushSaved),
         ],
       ),
       bottomNavigationBar: new BottomNavigationBar(
