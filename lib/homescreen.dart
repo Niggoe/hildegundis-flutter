@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'DateView.dart';
 import 'spiessbuch.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login.dart';
 
 void main() => runApp(new MaterialApp(home: new HomePage()));
 
@@ -13,18 +15,19 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _page = 0;
-  TabController tabController;
+  
+  PageController pageController;
 
   @override
   void initState() {
     super.initState();
-    tabController = new TabController(length: 2, vsync: this);
+    pageController = new PageController(initialPage: _page);
   }
 
   @override
   void dispose() {
     super.dispose();
-    tabController.dispose();
+    pageController.dispose();
   }
 
   @override
@@ -34,7 +37,8 @@ class HomePageState extends State<HomePage>
         title: new Text("Hildegundis APP"),
         backgroundColor: Colors.blue,
         actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.lock_open), onPressed: _pushSaved),
+          new IconButton(
+              icon: new Icon(Icons.do_not_disturb), onPressed: _pushSaved),
         ],
       ),
       bottomNavigationBar: new BottomNavigationBar(
@@ -48,28 +52,33 @@ class HomePageState extends State<HomePage>
         onTap: navigationTapped,
         currentIndex: _page,
       ),
-      body: new TabBarView(
+      body: new PageView(
         children: <Widget>[new CalendarView(), new BookView()],
-        controller: tabController,
+        controller: pageController,
+        onPageChanged: (newPage) {
+          setState(() {
+            this._page = newPage;
+          });
+        },
       ),
     );
   }
 
-  void _pushSaved() {}
+  void _pushSaved() {
+    FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushReplacementNamed(LoginPage.tag);
+  }
 
   void navigationTapped(int page) {
     // Animating to the page.
     // You can use whatever duration and curve you like
-    print("Switch to tab " + page.toString());
+    print("Switch to page " + page.toString());
     //_pageController.animateToPage(page,
     //  duration: const Duration(milliseconds: 300), curve: Curves.ease);
-    tabController.animateTo(page,
+    pageController.animateToPage(page,
         duration: const Duration(milliseconds: 300), curve: Curves.ease);
     setState(() {
       this._page = page;
     });
   }
 }
-
-
-

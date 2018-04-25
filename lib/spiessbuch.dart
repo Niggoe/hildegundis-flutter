@@ -3,10 +3,13 @@ import "dart:async";
 import "dart:convert";
 import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
 }
+
+const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
 
 class BookViewState extends State<BookView> {
   List data = new List();
@@ -66,5 +69,15 @@ class BookViewState extends State<BookView> {
             }));
   }
 
-  void addEventPressed() {}
+  Future addEventPressed() async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    var user_id = user.uid;
+    print("User: ${user.uid} wants to read");
+    if (!allowedUsers.contains(user_id)) {
+      final snackBar = new SnackBar(
+        content: new Text("Leider darfst du nichts hinzufügen"),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    } 
+  }
 }
