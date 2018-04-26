@@ -15,6 +15,7 @@ const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
 
 class BookViewState extends State<BookView> {
   List<Strafe> data = new List();
+  Map<String, List<Strafe>> perNameMap = new Map();
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/accountings");

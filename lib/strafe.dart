@@ -3,4 +3,5 @@ class Strafe{
   DateTime date;
   String grund;
   double betrag;
+  int id;
 }

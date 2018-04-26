@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'strafe.dart';
+import 'StrafeService.dart';
 
 class DialogAddStrafe extends StatefulWidget {
   @override
@@ -161,8 +162,16 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
       print('Grund: ${newStrafe.grund}');
       print('Betrag: ${newStrafe.betrag}');
       print('========================================');
-      print('Submitting to back end...');
-      print('TODO - we will write the submission part next...');
+
+      newStrafe.id = DateTime.now().millisecondsSinceEpoch;
+      try {
+        var strafeService = new StrafeService();
+        strafeService.createStrafe(newStrafe).then((value) =>
+            showMessage('Neue Strafe angelegt für ${value.name}', Colors.blue));
+      } catch (e) {
+        showMessage('Eintrag konnte nicht gespeichert werden ${e.toString()}',
+            Colors.red);
+      }
       Navigator.of(context).pop(newStrafe);
     }
   }
