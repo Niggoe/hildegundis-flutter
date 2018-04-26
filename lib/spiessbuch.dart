@@ -5,6 +5,7 @@ import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'addStrafeDialog.dart';
+import 'strafe.dart';
 
 class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
@@ -13,18 +14,34 @@ class BookView extends StatefulWidget {
 const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
 
 class BookViewState extends State<BookView> {
-  List data = new List();
-  List _items = [];
+  List<Strafe> data = new List();
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/accountings");
 
+    Map<String, dynamic> user = json.decode(response.body);
+    List<Strafe> allStrafen = createListFromStrafen(user);
     this.setState(() {
-      Map<String, dynamic> user = json.decode(response.body);
-      data = user["result"];
+      data = allStrafen;
     });
-
     return "Success";
+  }
+
+  List<Strafe> createListFromStrafen(Map<String, dynamic> user) {
+    List<Strafe> returnList = new List();
+    List values = new List();
+    values = user["result"];
+    print(values);
+    for (int i = 0; i < values.length; i++) {
+      Strafe currentStrafe = new Strafe();
+      currentStrafe.date = values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
+      currentStrafe.name = values[i]['name'];
+      currentStrafe.grund = values[i]["grund"];
+      int betragString = values[i]["betrag"];
+      currentStrafe.betrag = betragString.toDouble();
+      returnList.add(currentStrafe);
+    }
+    return returnList;
   }
 
   void initState() {
@@ -32,20 +49,18 @@ class BookViewState extends State<BookView> {
     this.fetchPost();
   }
 
-  Widget buildRow(data) {
-    var date = data["date"];
-
+  Widget buildRow(Strafe strafe) {
     //var parsedDate = DateTime.parse(date);
     //var formatter = new DateFormat("dd.MM.yyyy HH:mm");
     //var dateString = formatter.format(parsedDate);
 
     return new ListTile(
-      title: new Text(data["name"]),
-      subtitle: new Text(date +
+      title: new Text(strafe.name),
+      subtitle: new Text(strafe.date.toString() +
           "\n\n Grund: " +
-          data["grund"] +
+          strafe.grund +
           " - Betrag: " +
-          data["betrag"].toString()),
+          strafe.betrag.toString()),
       leading: new Icon(Icons.monetization_on),
     );
   }
@@ -81,14 +96,14 @@ class BookViewState extends State<BookView> {
       );
       Scaffold.of(context).showSnackBar(snackBar);
     } else {
-      ModelData data =
-          await Navigator.of(context).push(new MaterialPageRoute<ModelData>(
+      Strafe addedStrafe =
+          await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
               builder: (BuildContext context) {
                 return new DialogAddStrafe();
               },
               fullscreenDialog: true));
       setState(() {
-        _items.add(data);
+        data.add(addedStrafe);
       });
     }
   }
