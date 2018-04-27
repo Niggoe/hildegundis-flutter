@@ -32,12 +32,13 @@ class BookViewState extends State<BookView> {
     List<Strafe> returnList = new List();
     List values = new List();
     values = user["result"];
-    print(values);
     for (int i = 0; i < values.length; i++) {
       Strafe currentStrafe = new Strafe();
-      currentStrafe.date = values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
+      currentStrafe.date =
+          values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
       currentStrafe.name = values[i]['name'];
       currentStrafe.grund = values[i]["grund"];
+      currentStrafe.id = values[i]["key"];
       int betragString = values[i]["betrag"];
       currentStrafe.betrag = betragString.toDouble();
       returnList.add(currentStrafe);
@@ -50,20 +51,45 @@ class BookViewState extends State<BookView> {
     this.fetchPost();
   }
 
-  Widget buildRow(Strafe strafe) {
+  Widget buildRow(Strafe strafe, int index) {
     //var parsedDate = DateTime.parse(date);
     //var formatter = new DateFormat("dd.MM.yyyy HH:mm");
     //var dateString = formatter.format(parsedDate);
+    return new Dismissible(
+        key: new Key(strafe.id.toString()),
+        background: new Container(color: Colors.red),
+        onDismissed: (direction) {
+          this.setState(() {
+            data.removeAt(index);
+          });
 
-    return new ListTile(
-      title: new Text(strafe.name),
-      subtitle: new Text(strafe.date.toString() +
-          "\n\n Grund: " +
-          strafe.grund +
-          " - Betrag: " +
-          strafe.betrag.toString()),
-      leading: new Icon(Icons.monetization_on),
-    );
+          Scaffold.of(context).showSnackBar(new SnackBar(
+              action: new SnackBarAction(
+                label: 'UNDO',
+                onPressed: () {
+                  handleUndo(Strafe.from(strafe), index);
+                },
+              ),
+              content: new Text(
+                  "Item gelöscht für ${strafe.name} Grund: ${strafe.grund}"),
+              backgroundColor: Colors.lightGreen));
+        },
+        child: new ListTile(
+          title: new Text(strafe.name),
+          subtitle: new Text(strafe.date.toString() +
+              "\n\n Grund: " +
+              strafe.grund +
+              " - Betrag: " +
+              strafe.betrag.toString() +
+              "\n"),
+          leading: new Icon(Icons.monetization_on),
+        ));
+  }
+
+  handleUndo(Strafe strafe, int index) {
+    this.setState(() {
+      data.insert(index, strafe);
+    });
   }
 
   @override
@@ -80,20 +106,17 @@ class BookViewState extends State<BookView> {
         body: new ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemBuilder: (BuildContext context, index) {
-              if (index.isOdd) return new Divider();
-              final i = index ~/ 2;
-
-              if (i < data.length) return buildRow(data[i]);
+              if (index < data.length) return buildRow(data[index], index);
             }));
   }
 
   Future addEventPressed() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     var user_id = user.uid;
-    print("User: ${user.uid} wants to read");
     if (!allowedUsers.contains(user_id)) {
       final snackBar = new SnackBar(
         content: new Text("Leider darfst du keine Strafen hinzufügen"),
+        backgroundColor: Colors.red,
       );
       Scaffold.of(context).showSnackBar(snackBar);
     } else {

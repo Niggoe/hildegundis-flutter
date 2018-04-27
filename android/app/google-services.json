@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "480647437925",
+    "firebase_url": "https://hildegundisapplogin.firebaseio.com",
+    "project_id": "hildegundisapplogin",
+    "storage_bucket": "hildegundisapplogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480647437925:android:6143910fba7fa50a",
+        "android_client_info": {
+          "package_name": "com.nigromar.hildegundisapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "480647437925-lehcpodoru8jkf4vtgnqlh6g7vv6bgt8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhNBDAhYBLY77gJFkaHUTnWCe9XJgCMZU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
