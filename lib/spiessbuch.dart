@@ -42,7 +42,6 @@ class BookViewState extends State<BookView> {
       currentStrafe.name = values[i]['name'];
       currentStrafe.grund = values[i]["grund"];
       currentStrafe.id = values[i]["key"];
-      print(currentStrafe.id);
       if (values[i]["betrag"].runtimeType == int) {
         currentStrafe.betrag = values[i]["betrag"].toDouble();
       } else {
@@ -65,23 +64,13 @@ class BookViewState extends State<BookView> {
     //var dateString = formatter.format(parsedDate);
     return new Dismissible(
         key: new Key(strafe.id.toString()),
-        background: new Container(color: Colors.red),
+        background: new Container(
+          color: Colors.red,
+          child: new Icon(Icons.delete),
+        ),
+        direction: DismissDirection.endToStart,
         onDismissed: (direction) {
-          strafeService.deleteStrafe(strafe);
-          this.setState(() {
-            data.removeAt(index);
-          });
-
-          Scaffold.of(context).showSnackBar(new SnackBar(
-              action: new SnackBarAction(
-                label: 'UNDO',
-                onPressed: () {
-                  handleUndo(Strafe.from(strafe), index, strafeService);
-                },
-              ),
-              content: new Text(
-                  "Item gelöscht für ${strafe.name} Grund: ${strafe.grund}"),
-              backgroundColor: Colors.lightGreen));
+          handleDismissedSwipe(direction, strafe, index);
         },
         child: new ListTile(
           title: new Text(strafe.name),
@@ -141,12 +130,36 @@ class BookViewState extends State<BookView> {
           data.add(addedStrafe);
         });
       }
-    } else{
+    } else {
       final snackBar = new SnackBar(
         content: new Text("Bitte erst einloggen"),
         backgroundColor: Colors.red,
       );
       Scaffold.of(context).showSnackBar(snackBar);
     }
+  }
+
+  void handleDismissedSwipe(direction, Strafe strafe, int index) async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    print(user);
+    if (user != null) {
+      if (allowedUsers.contains(user.uid)) {
+        strafeService.deleteStrafe(strafe);
+      }
+    }
+    this.setState(() {
+      data.removeAt(index);
+    });
+
+    Scaffold.of(context).showSnackBar(new SnackBar(
+        action: new SnackBarAction(
+          label: 'UNDO',
+          onPressed: () {
+            handleUndo(Strafe.from(strafe), index, strafeService);
+          },
+        ),
+        content:
+            new Text("Item gelöscht für ${strafe.name} Grund: ${strafe.grund}"),
+        backgroundColor: Colors.lightGreen));
   }
 }
