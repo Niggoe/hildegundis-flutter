@@ -1,19 +1,32 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:intl/intl.dart';
-
 import 'strafe.dart';
 
 class StrafeService {
-  static const _serviceUrl = 'https://www.hildegundisapp.de/storeaccounting';
+  static const _serviceUrl = 'https://www.hildegundisapp.de/';
   static final _headers = {'Content-Type': 'application/json'};
 
   Future<Strafe> createStrafe(Strafe strafe) async {
     try {
       String json = _toJson(strafe);
-      final response =
-          await http.post(_serviceUrl, headers: _headers, body: json);
+      final response = await http.post(_serviceUrl + "storeaccounting",
+          headers: _headers, body: json);
+      var c = _fromJson(response.body);
+      return c;
+    } catch (e) {
+      print('Server exception');
+      print(e);
+      return null;
+    }
+  }
+
+  Future<Strafe> deleteStrafe(Strafe strafe) async {
+    try {
+      String json = _toJson(strafe);
+      final response = await http.delete(
+          _serviceUrl + "deleteAccounting/" + strafe.id.toString(),
+          headers: _headers);
       var c = _fromJson(response.body);
       return c;
     } catch (e) {

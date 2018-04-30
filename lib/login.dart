@@ -6,18 +6,17 @@ import 'homescreen.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
+
   @override
   State<StatefulWidget> createState() => new _LoginPageState();
 }
 
-enum FormType { login, register }
 
 class _LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
 
   String _email;
   String _password;
-  FormType _formType = FormType.login;
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -32,36 +31,16 @@ class _LoginPageState extends State<LoginPage> {
   Future validateAndSubmit() async {
     if (validateAndSave()) {
       try {
-        if (_formType == FormType.login) {
-          FirebaseUser user = await FirebaseAuth.instance
-              .signInWithEmailAndPassword(email: _email, password: _password);
-          print("Signed in: ${user.uid}");
-          Navigator.of(context).pushReplacementNamed(HomePage.tag);
-        } else {
-          FirebaseUser user = await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
-                  email: _email, password: _password);
-          print("Registered user ${user.uid}");
-        }
+        FirebaseUser user = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: _email, password: _password);
+        print("Signed in: ${user.uid}");
+        Navigator.of(context).pushReplacementNamed(HomePage.tag);
       } catch (e) {
         print("Error $e");
       }
     }
   }
 
-  void moveToRegister() {
-    formKey.currentState.reset();
-    setState(() {
-      _formType = FormType.register;
-    });
-  }
-
-  void moveToLogin() {
-    formKey.currentState.reset();
-    setState(() {
-      _formType = FormType.login;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,40 +76,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   List<Widget> buildSubmitButtons() {
-    if (_formType == FormType.login) {
-      return [
-        new RaisedButton(
-          onPressed: validateAndSubmit,
-          child: new Text(
-            'Login',
-            style: new TextStyle(fontSize: 20.0),
-          ),
+    return [
+      new RaisedButton(
+        onPressed: validateAndSubmit,
+        child: new Text(
+          'Login',
+          style: new TextStyle(fontSize: 20.0),
         ),
-        new FlatButton(
-          child: new Text(
-            'Create an account ',
-            style: new TextStyle(fontSize: 20.0),
-          ),
-          onPressed: moveToRegister,
-        )
-      ];
-    } else {
-      return [
-        new RaisedButton(
-          onPressed: validateAndSubmit,
-          child: new Text(
-            'Register',
-            style: new TextStyle(fontSize: 20.0),
-          ),
+      ),
+      new FlatButton(
+        child: new Text(
+          'Ohne Login weiter ',
+          style: new TextStyle(fontSize: 20.0),
         ),
-        new FlatButton(
-          child: new Text(
-            'Have an Account? Login',
-            style: new TextStyle(fontSize: 20.0),
-          ),
-          onPressed: moveToLogin,
-        )
-      ];
-    }
+        onPressed: handleLoginWithoutCredentials,
+      )
+    ];
+  }
+
+  void handleLoginWithoutCredentials() {
+    Navigator.of(context).pushReplacementNamed(HomePage.tag);
   }
 }

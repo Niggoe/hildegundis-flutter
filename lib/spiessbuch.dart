@@ -1,11 +1,12 @@
 import 'package:http/http.dart' as http;
 import "dart:async";
 import "dart:convert";
-import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'addStrafeDialog.dart';
 import 'strafe.dart';
+import 'StrafeService.dart';
 
 class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
@@ -16,6 +17,8 @@ const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
 class BookViewState extends State<BookView> {
   List<Strafe> data = new List();
   Map<String, List<Strafe>> perNameMap = new Map();
+  StrafeService strafeService = new StrafeService();
+  var formatter = new DateFormat("dd.MM.yyyy");
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/accountings");
@@ -39,8 +42,13 @@ class BookViewState extends State<BookView> {
       currentStrafe.name = values[i]['name'];
       currentStrafe.grund = values[i]["grund"];
       currentStrafe.id = values[i]["key"];
-      int betragString = values[i]["betrag"];
-      currentStrafe.betrag = betragString.toDouble();
+      print(currentStrafe.id);
+      if (values[i]["betrag"].runtimeType == int) {
+        currentStrafe.betrag = values[i]["betrag"].toDouble();
+      } else {
+        currentStrafe.betrag = values[i]["betrag"];
+      }
+
       returnList.add(currentStrafe);
     }
     return returnList;
@@ -59,6 +67,7 @@ class BookViewState extends State<BookView> {
         key: new Key(strafe.id.toString()),
         background: new Container(color: Colors.red),
         onDismissed: (direction) {
+          strafeService.deleteStrafe(strafe);
           this.setState(() {
             data.removeAt(index);
           });
@@ -67,7 +76,7 @@ class BookViewState extends State<BookView> {
               action: new SnackBarAction(
                 label: 'UNDO',
                 onPressed: () {
-                  handleUndo(Strafe.from(strafe), index);
+                  handleUndo(Strafe.from(strafe), index, strafeService);
                 },
               ),
               content: new Text(
@@ -76,17 +85,18 @@ class BookViewState extends State<BookView> {
         },
         child: new ListTile(
           title: new Text(strafe.name),
-          subtitle: new Text(strafe.date.toString() +
+          subtitle: new Text(formatter.format(strafe.date) +
               "\n\n Grund: " +
               strafe.grund +
               " - Betrag: " +
               strafe.betrag.toString() +
-              "\n"),
+              "€\n"),
           leading: new Icon(Icons.monetization_on),
         ));
   }
 
-  handleUndo(Strafe strafe, int index) {
+  handleUndo(Strafe strafe, int index, StrafeService strafService) {
+    strafService.createStrafe(strafe);
     this.setState(() {
       data.insert(index, strafe);
     });
@@ -112,23 +122,31 @@ class BookViewState extends State<BookView> {
 
   Future addEventPressed() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    var user_id = user.uid;
-    if (!allowedUsers.contains(user_id)) {
+    if (user != null) {
+      var user_id = user.uid;
+      if (!allowedUsers.contains(user_id)) {
+        final snackBar = new SnackBar(
+          content: new Text("Leider darfst du keine Strafen hinzufügen"),
+          backgroundColor: Colors.red,
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      } else {
+        Strafe addedStrafe =
+            await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
+                builder: (BuildContext context) {
+                  return new DialogAddStrafe();
+                },
+                fullscreenDialog: true));
+        setState(() {
+          data.add(addedStrafe);
+        });
+      }
+    } else{
       final snackBar = new SnackBar(
-        content: new Text("Leider darfst du keine Strafen hinzufügen"),
+        content: new Text("Bitte erst einloggen"),
         backgroundColor: Colors.red,
       );
       Scaffold.of(context).showSnackBar(snackBar);
-    } else {
-      Strafe addedStrafe =
-          await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
-              builder: (BuildContext context) {
-                return new DialogAddStrafe();
-              },
-              fullscreenDialog: true));
-      setState(() {
-        data.add(addedStrafe);
-      });
     }
   }
 }
