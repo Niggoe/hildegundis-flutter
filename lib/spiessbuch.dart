@@ -33,6 +33,7 @@ class BookViewState extends State<BookView> {
 
   List<Strafe> createListFromStrafen(Map<String, dynamic> user) {
     List<Strafe> returnList = new List();
+    Map<String, List<Strafe>> mapPerName = new Map();
     List values = new List();
     values = user["result"];
     for (int i = 0; i < values.length; i++) {
@@ -47,7 +48,16 @@ class BookViewState extends State<BookView> {
       } else {
         currentStrafe.betrag = values[i]["betrag"];
       }
-
+      if (perNameMap.containsKey(currentStrafe.name)) {
+        perNameMap[currentStrafe.name].add(currentStrafe);
+      } else {
+        List<Strafe> userStrafe = new List();
+        userStrafe.add(currentStrafe);
+        perNameMap[currentStrafe.name] = userStrafe;
+      }
+      this.setState(() {
+        perNameMap = mapPerName;
+      });
       returnList.add(currentStrafe);
     }
     return returnList;
@@ -57,6 +67,7 @@ class BookViewState extends State<BookView> {
     super.initState();
     this.fetchPost();
   }
+
 
   Widget buildRow(Strafe strafe, int index) {
     //var parsedDate = DateTime.parse(date);
