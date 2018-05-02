@@ -68,7 +68,6 @@ class BookViewState extends State<BookView> {
     this.fetchPost();
   }
 
-
   Widget buildRow(Strafe strafe, int index) {
     //var parsedDate = DateTime.parse(date);
     //var formatter = new DateFormat("dd.MM.yyyy HH:mm");
@@ -104,7 +103,6 @@ class BookViewState extends State<BookView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Scaffold(
         floatingActionButton: new FloatingActionButton(
           onPressed: () {

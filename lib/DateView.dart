@@ -42,7 +42,6 @@ class CalendarViewState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Scaffold(
         floatingActionButton: new FloatingActionButton(
           onPressed: () {
@@ -62,5 +61,4 @@ class CalendarViewState extends State<CalendarView> {
   }
 
   void addEventPressed() {}
-
 }
