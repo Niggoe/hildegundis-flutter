@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'addStrafeDialog.dart';
 import 'strafe.dart';
 import 'StrafeService.dart';
+import 'SpiessDetailView.dart';
 
 class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
@@ -24,22 +25,21 @@ class BookViewState extends State<BookView> {
     var response = await http.get("https://www.hildegundisapp.de/accountings");
 
     Map<String, dynamic> user = json.decode(response.body);
-    List<Strafe> allStrafen = createListFromStrafen(user);
+    Map<String, List<Strafe>> fetchedNameMap = createListFromStrafen(user);
     this.setState(() {
-      data = allStrafen;
+      perNameMap = fetchedNameMap;
     });
     return "Success";
   }
 
-  List<Strafe> createListFromStrafen(Map<String, dynamic> user) {
-    List<Strafe> returnList = new List();
+  Map<String, List<Strafe>> createListFromStrafen(Map<String, dynamic> user) {
     Map<String, List<Strafe>> mapPerName = new Map();
     List values = new List();
     values = user["result"];
     for (int i = 0; i < values.length; i++) {
       Strafe currentStrafe = new Strafe();
       currentStrafe.date =
-          values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
+      values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
       currentStrafe.name = values[i]['name'];
       currentStrafe.grund = values[i]["grund"];
       currentStrafe.id = values[i]["key"];
@@ -48,19 +48,15 @@ class BookViewState extends State<BookView> {
       } else {
         currentStrafe.betrag = values[i]["betrag"];
       }
-      if (perNameMap.containsKey(currentStrafe.name)) {
-        perNameMap[currentStrafe.name].add(currentStrafe);
+      if (mapPerName.containsKey(currentStrafe.name)) {
+        mapPerName[currentStrafe.name].add(currentStrafe);
       } else {
         List<Strafe> userStrafe = new List();
         userStrafe.add(currentStrafe);
-        perNameMap[currentStrafe.name] = userStrafe;
+        mapPerName[currentStrafe.name] = userStrafe;
       }
-      this.setState(() {
-        perNameMap = mapPerName;
-      });
-      returnList.add(currentStrafe);
     }
-    return returnList;
+    return mapPerName;
   }
 
   void initState() {
@@ -68,41 +64,33 @@ class BookViewState extends State<BookView> {
     this.fetchPost();
   }
 
-  Widget buildRow(Strafe strafe, int index) {
-    //var parsedDate = DateTime.parse(date);
-    //var formatter = new DateFormat("dd.MM.yyyy HH:mm");
-    //var dateString = formatter.format(parsedDate);
-    return new Dismissible(
-        key: new Key(strafe.id.toString()),
-        background: new Container(
-          color: Colors.red,
-          child: new Icon(Icons.delete),
-        ),
-        direction: DismissDirection.endToStart,
-        onDismissed: (direction) {
-          handleDismissedSwipe(direction, strafe, index);
-        },
-        child: new ListTile(
-          title: new Text(strafe.name),
-          subtitle: new Text(formatter.format(strafe.date) +
-              "\n\n Grund: " +
-              strafe.grund +
-              " - Betrag: " +
-              strafe.betrag.toString() +
-              "€\n"),
-          leading: new Icon(Icons.monetization_on),
-        ));
-  }
+  Widget buildRowTotal(List<Strafe> strafePerName, int index, String name) {
+    double wholeBetrag = 0.0;
 
-  handleUndo(Strafe strafe, int index, StrafeService strafService) {
-    strafService.createStrafe(strafe);
-    this.setState(() {
-      data.insert(index, strafe);
-    });
+    for (Strafe straf in strafePerName) {
+      wholeBetrag += straf.betrag;
+    }
+
+    return new ListTile(
+      key: new Key(name),
+      title: new Text(name),
+      subtitle: new Text(wholeBetrag.toString() + "€"),
+      leading: new Icon(Icons.face),
+      onTap: () {
+        var route = new MaterialPageRoute(
+          builder: (BuildContext context) =>
+          new DetailPageStrafe(
+              strafenPerName: strafePerName, nameStrafen: name),
+        );
+        Navigator.of(context).push(route);
+      },
+      onLongPress: () => handleLongPress(strafePerName, name),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    var keys = perNameMap.keys.toList();
     return new Scaffold(
         floatingActionButton: new FloatingActionButton(
           onPressed: () {
@@ -114,7 +102,10 @@ class BookViewState extends State<BookView> {
         body: new ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemBuilder: (BuildContext context, index) {
-              if (index < data.length) return buildRow(data[index], index);
+              if (index < keys.length)
+                return buildRowTotal(
+                    perNameMap[keys[index]], index, keys[index]);
+              //if (index < data.length) return buildRow(data[index], index);
             }));
   }
 
@@ -130,13 +121,16 @@ class BookViewState extends State<BookView> {
         Scaffold.of(context).showSnackBar(snackBar);
       } else {
         Strafe addedStrafe =
-            await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
-                builder: (BuildContext context) {
-                  return new DialogAddStrafe();
-                },
-                fullscreenDialog: true));
+        await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
+            builder: (BuildContext context) {
+              return new DialogAddStrafe();
+            },
+            fullscreenDialog: true));
         setState(() {
-          data.add(addedStrafe);
+          if (!perNameMap.containsKey(addedStrafe.name)) {
+            perNameMap[addedStrafe.name] = new List();
+          }
+          perNameMap[addedStrafe.name].add(addedStrafe);
         });
       }
     } else {
@@ -148,27 +142,30 @@ class BookViewState extends State<BookView> {
     }
   }
 
-  void handleDismissedSwipe(direction, Strafe strafe, int index) async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    print(user);
-    if (user != null) {
-      if (allowedUsers.contains(user.uid)) {
-        strafeService.deleteStrafe(strafe);
-      }
-    }
-    this.setState(() {
-      data.removeAt(index);
-    });
-
-    Scaffold.of(context).showSnackBar(new SnackBar(
-        action: new SnackBarAction(
-          label: 'UNDO',
-          onPressed: () {
-            handleUndo(Strafe.from(strafe), index, strafeService);
-          },
-        ),
-        content:
-            new Text("Item gelöscht für ${strafe.name} Grund: ${strafe.grund}"),
-        backgroundColor: Colors.lightGreen));
+  handleLongPress(List<Strafe> listForName, String name) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            content: new Text("Alle Strafen löschen?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    strafeService.deleteStrafeList(listForName);
+                    this.setState(() {
+                      perNameMap.remove(name);
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: new Text("OK")),
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: new Text("Abbruch"))
+            ],
+          );
+        });
   }
+
 }

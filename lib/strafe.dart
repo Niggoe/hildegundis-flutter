@@ -13,4 +13,9 @@ class Strafe {
         id = other.id;
 
   Strafe();
+
+  @override
+  String toString() {
+    return "Name: ${this.name} Betrag: ${this.betrag}";
+  }
 }

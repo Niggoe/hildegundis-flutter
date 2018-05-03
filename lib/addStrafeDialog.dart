@@ -140,7 +140,7 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
               validator: (val) =>
                   val.isEmpty ? 'Ein Betrag wird benötigt' : null,
               onSaved: (String value) {
-                newStrafe.betrag = double.parse(value);
+                newStrafe.betrag = double.parse(value.replaceAll(",", "."));
               },
             )
           ].toList(),

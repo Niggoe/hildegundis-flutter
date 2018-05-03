@@ -34,8 +34,8 @@ class HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Hildegundis APP"),
-        backgroundColor: Colors.blue,
+        title: new Text("GHvM"),
+        backgroundColor: Colors.indigo,
         actions: <Widget>[
           new IconButton(
               icon: new Icon(Icons.do_not_disturb), onPressed: _pushSaved),
@@ -70,11 +70,6 @@ class HomePageState extends State<HomePage>
   }
 
   void navigationTapped(int page) {
-    // Animating to the page.
-    // You can use whatever duration and curve you like
-    print("Switch to page " + page.toString());
-    //_pageController.animateToPage(page,
-    //  duration: const Duration(milliseconds: 300), curve: Curves.ease);
     pageController.animateToPage(page,
         duration: const Duration(milliseconds: 300), curve: Curves.ease);
     setState(() {

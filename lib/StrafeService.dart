@@ -21,6 +21,22 @@ class StrafeService {
     }
   }
 
+  Future<Strafe> deleteStrafeList(List<Strafe> allStrafen) async {
+    try {
+      for (Strafe strafe in allStrafen) {
+        String json = _toJson(strafe);
+        final response = await http.delete(
+            _serviceUrl + "deleteAccounting/" + strafe.id.toString(),
+            headers: _headers);
+      }
+      return null;
+    } catch (e) {
+      print('Server exception');
+      print(e);
+      return null;
+    }
+  }
+
   Future<Strafe> deleteStrafe(Strafe strafe) async {
     try {
       String json = _toJson(strafe);
