@@ -70,14 +70,17 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
 
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(title: const Text('Neue Strafe'), actions: <Widget>[
-        new FlatButton(
-            child: new Text('Speichern',
-                style: theme.textTheme.body1.copyWith(color: Colors.white)),
-            onPressed: () {
-              _submitForm();
-            })
-      ]),
+      appBar: new AppBar(
+          title: const Text('Neue Strafe'),
+          backgroundColor: Colors.indigo,
+          actions: <Widget>[
+            new FlatButton(
+                child: new Text('Speichern',
+                    style: theme.textTheme.body1.copyWith(color: Colors.white)),
+                onPressed: () {
+                  _submitForm();
+                })
+          ]),
       body: new Form(
         key: _formKey,
         autovalidate: true,

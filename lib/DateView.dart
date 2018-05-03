@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import "dart:async";
 import "dart:convert";
 import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
+import 'event.dart';
+import 'addEventDialog.dart';
 
 class CalendarView extends StatefulWidget {
   CalendarViewState createState() => new CalendarViewState();
@@ -60,5 +63,18 @@ class CalendarViewState extends State<CalendarView> {
             }));
   }
 
-  void addEventPressed() {}
+  Future addEventPressed() async {
+    Event addedStrafe =
+        await Navigator.of(context).push(new MaterialPageRoute<Event>(
+            builder: (BuildContext context) {
+              return new AddEvent();
+            },
+            fullscreenDialog: true));
+    setState(() {
+//          if (!perNameMap.containsKey(addedStrafe.name)) {
+//            perNameMap[addedStrafe.name] = new List();
+//          }
+//          perNameMap[addedStrafe.name].add(addedStrafe);
+    });
+  }
 }
