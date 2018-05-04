@@ -6,5 +6,8 @@ class Event{
   int id;
 
 
-
+  @override
+  String toString() {
+    return this.title + "\t " + this.location;
+  }
 }

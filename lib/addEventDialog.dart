@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'event.dart';
+import 'eventService.dart';
 
 class AddEvent extends StatefulWidget {
   @override
@@ -137,6 +138,7 @@ class _AddEventState extends State<AddEvent> {
     var result = await showDatePicker(
         context: context,
         initialDate: initialDate,
+
         firstDate: new DateTime(1900),
         lastDate: new DateTime(2030));
 
@@ -150,7 +152,7 @@ class _AddEventState extends State<AddEvent> {
 
   Future _chooseTime(BuildContext context, String initialDateString) async {
     final TimeOfDay time = new TimeOfDay.now();
-    var result = await showTimePicker(context: context, initialTime: time, );
+    var result = await showTimePicker(context: context, initialTime: time );
 
     if (result == null) return;
 
@@ -171,15 +173,14 @@ class _AddEventState extends State<AddEvent> {
       DateTime eventDate = new DateTime(dateTimeDate.year, dateTimeDate.month,
           dateTimeDate.day, dateTimeTime.hour, dateTimeTime.minute);
       newEvent.timepoint = eventDate;
-      print(newEvent.timepoint);
-//      try {
-//        var strafeService = new StrafeService();
-//        strafeService.createStrafe(newStrafe).then((value) =>
-//            showMessage('Neue Strafe angelegt für ${value.name}', Colors.blue));
-//      } catch (e) {
-//        showMessage('Eintrag konnte nicht gespeichert werden ${e.toString()}',
-//            Colors.red);
-//      }
+      try {
+        var eventService = new EventService();
+        eventService.createEvent(newEvent).then((value) =>
+            showMessage('Neues Event angelegt für ${value.title}', Colors.blue));
+      } catch (e) {
+        showMessage('Eintrag konnte nicht gespeichert werden ${e.toString()}',
+            Colors.red);
+      }
       Navigator.of(context).pop(newEvent);
     }
   }
