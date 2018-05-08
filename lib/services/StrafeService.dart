@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'strafe.dart';
+import 'package:hildegundis_app/models/strafe.dart';
 
 class StrafeService {
   static const _serviceUrl = 'https://www.hildegundisapp.de/';

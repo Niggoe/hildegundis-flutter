@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'strafe.dart';
+import 'package:hildegundis_app/models/strafe.dart';
 import 'package:intl/intl.dart';
-import 'StrafeService.dart';
+import 'package:hildegundis_app/services/StrafeService.dart';
 
 class DetailPageStrafe extends StatefulWidget {
   @override
