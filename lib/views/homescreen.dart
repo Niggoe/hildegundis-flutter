@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'DateView.dart';
-import 'spiessbuch.dart';
+import 'package:hildegundis_app/views/DateView.dart';
+import 'package:hildegundis_app/views/spiessbuch.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'login.dart';
+import 'package:hildegundis_app/views/login.dart';
 
 void main() => runApp(new MaterialApp(home: new HomePage()));
 

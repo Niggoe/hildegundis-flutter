@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'homescreen.dart';
+import 'package:hildegundis_app/views/homescreen.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
