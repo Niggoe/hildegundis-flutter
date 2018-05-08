@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'event.dart';
-import 'eventService.dart';
+import 'package:hildegundis_app/models/event.dart';
+import 'package:hildegundis_app/services/eventService.dart';
 
 class AddEvent extends StatefulWidget {
   @override

@@ -4,9 +4,9 @@ import "dart:async";
 import "dart:convert";
 import "package:intl/intl.dart";
 import 'package:flutter/material.dart';
-import 'event.dart';
-import 'addEventDialog.dart';
-import 'eventService.dart';
+import 'package:hildegundis_app/models/event.dart';
+import 'package:hildegundis_app/dialogs/addEventDialog.dart';
+import 'package:hildegundis_app/services/eventService.dart';
 
 class CalendarView extends StatefulWidget {
   CalendarViewState createState() => new CalendarViewState();
@@ -15,6 +15,7 @@ class CalendarView extends StatefulWidget {
 class CalendarViewState extends State<CalendarView> {
   List<Event> data = new List();
   EventService eventService = new EventService();
+  bool _loadingInProgress;
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/dates");
@@ -38,6 +39,7 @@ class CalendarViewState extends State<CalendarView> {
 
     this.setState(() {
       data.addAll(finalEvents);
+      _loadingInProgress = false;
     });
 
     return "Success";
@@ -45,20 +47,28 @@ class CalendarViewState extends State<CalendarView> {
 
   void initState() {
     super.initState();
+    _loadingInProgress = true;
     this.fetchPost();
   }
 
   Widget buildRow(Event data, int index) {
     var formatter = new DateFormat("dd.MM.yyyy HH:mm");
-    var dateString = formatter.format(data.timepoint);
-
-    return new ListTile(
-      title: new Text(data.title),
-      subtitle: new Text(
-          dateString + " Uhr\n\n" + data.location + " - " + data.clothes + "\n\n"),
-      leading: new Icon(Icons.event),
-      onLongPress: () => handleLongPress(data, index),
-    );
+    var dateString;
+    if (data != null) {
+      dateString = formatter.format(data.timepoint);
+      return new ListTile(
+        title: new Text(data.title),
+        subtitle: new Text(dateString +
+            " Uhr\n\n" +
+            data.location +
+            " - " +
+            data.clothes +
+            "\n\n"),
+        leading: new Icon(Icons.event),
+        onLongPress: () => handleLongPress(data, index),
+      );
+    }
+    return null;
   }
 
   @override
@@ -71,11 +81,22 @@ class CalendarViewState extends State<CalendarView> {
           tooltip: "Termin hinzufügen",
           child: new Icon(Icons.add),
         ),
-        body: new ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemBuilder: (BuildContext context, index) {
-              if (index < data.length) return buildRow(data[index], index);
-            }));
+        body: buildBody());
+  }
+
+  Widget buildBody() {
+    if (_loadingInProgress) {
+      return new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      return new ListView.builder(
+          padding: const EdgeInsets.all(16.0),
+          itemCount: data.length,
+          itemBuilder: (BuildContext context, index) {
+            if (index < data.length) return buildRow(data[index], index);
+          });
+    }
   }
 
   Future addEventPressed() async {
@@ -85,10 +106,12 @@ class CalendarViewState extends State<CalendarView> {
               return new AddEvent();
             },
             fullscreenDialog: true));
-    eventService.createEvent(addedEvent);
-    setState(() {
-      data.add(addedEvent);
-    });
+    if (addedEvent != null) {
+      eventService.createEvent(addedEvent);
+      setState(() {
+        data.add(addedEvent);
+      });
+    }
   }
 
   handleLongPress(Event eventToDelete, int index) {

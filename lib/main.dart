@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'homescreen.dart';
+import 'package:hildegundis_app/views/login.dart';
+import 'package:hildegundis_app/views/homescreen.dart';
 
 void main() => runApp(new MyApp());
 

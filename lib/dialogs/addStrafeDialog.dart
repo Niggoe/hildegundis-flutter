@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'strafe.dart';
-import 'StrafeService.dart';
+import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/services/StrafeService.dart';
 
 class DialogAddStrafe extends StatefulWidget {
   @override
@@ -117,6 +117,8 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
                         labelText: 'Datum',
                       ),
                       controller: _controller,
+                      validator: (val) =>
+                          val.isEmpty ? 'Ein Datum wird benötigt' : null,
                       keyboardType: TextInputType.datetime,
                       onSaved: (val) => newStrafe.date = convertToDate(val))),
               new IconButton(

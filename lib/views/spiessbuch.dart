@@ -4,9 +4,9 @@ import "dart:convert";
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'addStrafeDialog.dart';
-import 'strafe.dart';
-import 'StrafeService.dart';
+import 'package:hildegundis_app/dialogs/addStrafeDialog.dart';
+import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/services/StrafeService.dart';
 import 'SpiessDetailView.dart';
 
 class BookView extends StatefulWidget {
@@ -20,6 +20,7 @@ class BookViewState extends State<BookView> {
   Map<String, List<Strafe>> perNameMap = new Map();
   StrafeService strafeService = new StrafeService();
   var formatter = new DateFormat("dd.MM.yyyy");
+  bool _loadingData;
 
   Future<String> fetchPost() async {
     var response = await http.get("https://www.hildegundisapp.de/accountings");
@@ -28,6 +29,7 @@ class BookViewState extends State<BookView> {
     Map<String, List<Strafe>> fetchedNameMap = createListFromStrafen(user);
     this.setState(() {
       perNameMap = fetchedNameMap;
+      _loadingData = false;
     });
     return "Success";
   }
@@ -39,7 +41,7 @@ class BookViewState extends State<BookView> {
     for (int i = 0; i < values.length; i++) {
       Strafe currentStrafe = new Strafe();
       currentStrafe.date =
-      values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
+          values[i]["date"] == '' ? null : DateTime.parse(values[i]["date"]);
       currentStrafe.name = values[i]['name'];
       currentStrafe.grund = values[i]["grund"];
       currentStrafe.id = values[i]["key"];
@@ -60,6 +62,7 @@ class BookViewState extends State<BookView> {
   }
 
   void initState() {
+    _loadingData = true;
     super.initState();
     this.fetchPost();
   }
@@ -78,8 +81,7 @@ class BookViewState extends State<BookView> {
       leading: new Icon(Icons.face),
       onTap: () {
         var route = new MaterialPageRoute(
-          builder: (BuildContext context) =>
-          new DetailPageStrafe(
+          builder: (BuildContext context) => new DetailPageStrafe(
               strafenPerName: strafePerName, nameStrafen: name),
         );
         Navigator.of(context).push(route);
@@ -90,7 +92,7 @@ class BookViewState extends State<BookView> {
 
   @override
   Widget build(BuildContext context) {
-    var keys = perNameMap.keys.toList();
+
     return new Scaffold(
         floatingActionButton: new FloatingActionButton(
           onPressed: () {
@@ -99,14 +101,24 @@ class BookViewState extends State<BookView> {
           tooltip: "Termin hinzufügen",
           child: new Icon(Icons.add),
         ),
-        body: new ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemBuilder: (BuildContext context, index) {
-              if (index < keys.length)
-                return buildRowTotal(
-                    perNameMap[keys[index]], index, keys[index]);
-              //if (index < data.length) return buildRow(data[index], index);
-            }));
+        body: buildBody());
+  }
+
+  Widget buildBody() {
+    if (_loadingData) {
+      return new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      var keys = perNameMap.keys.toList();
+      return new ListView.builder(
+          padding: const EdgeInsets.all(16.0),
+          itemBuilder: (BuildContext context, index) {
+            if (index < keys.length)
+              return buildRowTotal(perNameMap[keys[index]], index, keys[index]);
+            //if (index < data.length) return buildRow(data[index], index);
+          });
+    }
   }
 
   Future addEventPressed() async {
@@ -121,11 +133,11 @@ class BookViewState extends State<BookView> {
         Scaffold.of(context).showSnackBar(snackBar);
       } else {
         Strafe addedStrafe =
-        await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
-            builder: (BuildContext context) {
-              return new DialogAddStrafe();
-            },
-            fullscreenDialog: true));
+            await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
+                builder: (BuildContext context) {
+                  return new DialogAddStrafe();
+                },
+                fullscreenDialog: true));
         setState(() {
           if (!perNameMap.containsKey(addedStrafe.name)) {
             perNameMap[addedStrafe.name] = new List();
@@ -167,5 +179,4 @@ class BookViewState extends State<BookView> {
           );
         });
   }
-
 }

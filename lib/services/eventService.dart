@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'event.dart';
+import 'package:hildegundis_app/models/event.dart';
 
 class EventService {
   static const _serviceUrl = 'https://www.hildegundisapp.de/';
