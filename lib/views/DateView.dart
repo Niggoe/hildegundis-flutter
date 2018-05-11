@@ -12,6 +12,8 @@ class CalendarView extends StatefulWidget {
   CalendarViewState createState() => new CalendarViewState();
 }
 
+const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
+
 class CalendarViewState extends State<CalendarView> {
   List<Event> data = new List();
   EventService eventService = new EventService();
@@ -114,29 +116,47 @@ class CalendarViewState extends State<CalendarView> {
     }
   }
 
-  handleLongPress(Event eventToDelete, int index) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            content: new Text("Termin löschen?"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    eventService.deleteEvent(eventToDelete);
-                    this.setState(() {
-                      data.removeAt(index);
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: new Text("OK")),
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: new Text("Abbruch"))
-            ],
-          );
-        });
+  Future handleLongPress(Event eventToDelete, int index) async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (user != null) {
+      var user_id = user.uid;
+      if (!allowedUsers.contains(user_id)) {
+        final snackBar = new SnackBar(
+          content: new Text("Leider darfst du keine Termine löschen"),
+          backgroundColor: Colors.red,
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return new AlertDialog(
+                content: new Text("Termin löschen?"),
+                actions: <Widget>[
+                  new FlatButton(
+                      onPressed: () {
+                        eventService.deleteEvent(eventToDelete);
+                        this.setState(() {
+                          data.removeAt(index);
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: new Text("OK")),
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: new Text("Abbruch"))
+                ],
+              );
+            });
+      }
+    } else {
+      final snackBar = new SnackBar(
+        content: new Text("Bitte erst einloggen"),
+        backgroundColor: Colors.red,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 }

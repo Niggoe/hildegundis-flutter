@@ -154,29 +154,47 @@ class BookViewState extends State<BookView> {
     }
   }
 
-  handleLongPress(List<Strafe> listForName, String name) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            content: new Text("Alle Strafen löschen?"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    strafeService.deleteStrafeList(listForName);
-                    this.setState(() {
-                      perNameMap.remove(name);
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: new Text("OK")),
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: new Text("Abbruch"))
-            ],
-          );
-        });
+  Future handleLongPress(List<Strafe> listForName, String name) async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (user != null) {
+      var user_id = user.uid;
+      if (!allowedUsers.contains(user_id)) {
+        final snackBar = new SnackBar(
+          content: new Text("Leider darfst du keine Strafen löschen"),
+          backgroundColor: Colors.red,
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return new AlertDialog(
+                content: new Text("Alle Strafen löschen?"),
+                actions: <Widget>[
+                  new FlatButton(
+                      onPressed: () {
+                        strafeService.deleteStrafeList(listForName);
+                        this.setState(() {
+                          perNameMap.remove(name);
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: new Text("OK")),
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: new Text("Abbruch"))
+                ],
+              );
+            });
+      }
+    } else {
+      final snackBar = new SnackBar(
+        content: new Text("Bitte erst einloggen"),
+        backgroundColor: Colors.red,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 }
