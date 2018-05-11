@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hildegundis_app/views/login.dart';
 import 'package:hildegundis_app/views/homescreen.dart';
+import "dart:async";
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() => runApp(new MyApp());
 
@@ -13,12 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Login Page',
-      theme: new ThemeData(
-        primarySwatch: Colors.indigo,
-      ),
-      routes: routes,
-      home: LoginPage(),
-    );
+        title: 'Login Page',
+        theme: new ThemeData(
+          primarySwatch: Colors.indigo,
+        ),
+        routes: routes,
+        home: new LoginPage());
   }
 }
