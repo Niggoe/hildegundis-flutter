@@ -13,7 +13,6 @@ dependencies:
   intl: "0.15.5"
   firebase_auth: 0.5.4
   flutter_launcher_icons: "^0.2.1"
-  firebase_messaging: "0.2.5"
 
 dev_dependencies:
   flutter_test:
