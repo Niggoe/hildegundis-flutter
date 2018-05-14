@@ -13,7 +13,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> implements AuthStateListener {
   final formKey = new GlobalKey<FormState>();
-
+  BuildContext _ctx;
   String _email;
   String _password;
 
@@ -40,8 +40,7 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
         print("Signed in: ${user.uid}");
         var authStateProvider = new AuthStateProvider();
         authStateProvider.notify(AuthState.LOGGED_IN);
-
-        Navigator.of(context).pushReplacementNamed(HomePage.tag);
+        Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
       } catch (e) {
         print("Error $e");
       }
@@ -50,6 +49,7 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
 
   @override
   Widget build(BuildContext context) {
+    _ctx = context;
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Login Hildegundis APP"),
@@ -58,29 +58,45 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
           padding: EdgeInsets.only(left: 24.0, right: 24.0),
           child: new Form(
               key: formKey,
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: new ListView(
                 children: buildInputs(),
+                scrollDirection: Axis.vertical,
               ))),
     );
   }
 
   List<Widget> buildInputs() {
     return [
-      new CircleAvatar(
-        backgroundColor: Colors.transparent,
-        radius: 80.0,
-        child: Image.asset('assets/AppLogo.png'),
+      SizedBox(
+        height: 12.0,
+      ),
+      new Row(
+        children: [
+          new Expanded(
+              child: SizedBox(
+            height: 12.0,
+          )),
+          new Expanded(
+              child: new CircleAvatar(
+            backgroundColor: Colors.transparent,
+            backgroundImage: new AssetImage('assets/AppLogo.png'),
+            radius: 50.0,
+          )),
+          new Expanded(
+              child: SizedBox(
+            height: 12.0,
+          )),
+        ],
       ),
       SizedBox(
-        height: 48.0,
+        height: 12.0
       ),
       new TextFormField(
         decoration: new InputDecoration(
             labelText: 'Email',
             contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+                OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))),
         validator: (value) => value.isEmpty ? 'Email cannot be empty' : null,
         onSaved: (value) => _email = value,
       ),
@@ -90,7 +106,7 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
             labelText: 'Passwort',
             contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+                OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))),
         validator: (value) => value.isEmpty ? 'Password cannot be empty' : null,
         obscureText: true,
         onSaved: (value) => _password = value,
@@ -111,25 +127,32 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
           ),
         ),
       ),
-      new FlatButton(
-        child: new Text(
-          'Ohne Login weiter ',
-          style: new TextStyle(fontSize: 20.0),
+      new Padding(
+        padding: EdgeInsets.symmetric(vertical: 2.0),
+        child: Material(
+          borderRadius: BorderRadius.circular(30.0),
+          shadowColor: Colors.redAccent.shade100,
+          elevation: 5.0,
+          child: MaterialButton(
+            minWidth: 200.0,
+            height: 42.0,
+            onPressed: handleLoginWithoutCredentials,
+            color: Colors.redAccent,
+            child: Text('Ohne Login weiter', style: TextStyle(color: Colors.white)),
+          ),
         ),
-        onPressed: handleLoginWithoutCredentials,
       )
     ];
   }
 
-
   void handleLoginWithoutCredentials() {
-    Navigator.of(context).pushReplacementNamed(HomePage.tag);
+    Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
   }
 
   @override
   void onAuthStateChanged(AuthState state) {
     if (state == AuthState.LOGGED_IN) {
-      Navigator.of(context).pushReplacementNamed(HomePage.tag);
+      Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
     }
   }
 }

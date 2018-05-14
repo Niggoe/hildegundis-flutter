@@ -44,7 +44,7 @@ class _State extends State<DetailPageStrafe> {
           subtitle: new Text("Grund: " +
               strafe.grund +
               "\nBetrag: " +
-              strafe.betrag.toString() +
+              strafe.betrag.toStringAsFixed(2) +
               "€"),
           leading: new Icon(Icons.monetization_on),
         ),

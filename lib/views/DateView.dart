@@ -12,7 +12,7 @@ class CalendarView extends StatefulWidget {
   CalendarViewState createState() => new CalendarViewState();
 }
 
-const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
+const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2", "q34qmsOSzWWR30I06omGJ3ti0142", "v8qunIYGqhNnGPUdykHqFs2ABYW2"];
 
 class CalendarViewState extends State<CalendarView> {
   List<Event> data = new List();
@@ -102,17 +102,35 @@ class CalendarViewState extends State<CalendarView> {
   }
 
   Future addEventPressed() async {
-    Event addedEvent =
-        await Navigator.of(context).push(new MaterialPageRoute<Event>(
-            builder: (BuildContext context) {
-              return new AddEvent();
-            },
-            fullscreenDialog: true));
-    if (addedEvent != null) {
-      eventService.createEvent(addedEvent);
-      setState(() {
-        data.add(addedEvent);
-      });
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (user != null) {
+      var user_id = user.uid;
+      if (!allowedUsers.contains(user_id)) {
+        final snackBar = new SnackBar(
+          content: new Text("Leider darfst du keine Termine hinzufügen"),
+          backgroundColor: Colors.red,
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      } else {
+        Event addedEvent =
+            await Navigator.of(context).push(new MaterialPageRoute<Event>(
+                builder: (BuildContext context) {
+                  return new AddEvent();
+                },
+                fullscreenDialog: true));
+        if (addedEvent != null) {
+          eventService.createEvent(addedEvent);
+          setState(() {
+            data.add(addedEvent);
+          });
+        }
+      }
+    } else {
+      final snackBar = new SnackBar(
+        content: new Text("Bitte erst einloggen"),
+        backgroundColor: Colors.red,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
     }
   }
 

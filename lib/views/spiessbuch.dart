@@ -13,7 +13,7 @@ class BookView extends StatefulWidget {
   BookViewState createState() => new BookViewState();
 }
 
-const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2"];
+const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2", "q34qmsOSzWWR30I06omGJ3ti0142", "v8qunIYGqhNnGPUdykHqFs2ABYW2"];
 
 class BookViewState extends State<BookView> {
   List<Strafe> data = new List();
@@ -77,7 +77,7 @@ class BookViewState extends State<BookView> {
     return new ListTile(
       key: new Key(name),
       title: new Text(name),
-      subtitle: new Text(wholeBetrag.toString() + "€"),
+      subtitle: new Text(wholeBetrag.toStringAsFixed(2) + "€"),
       leading: new Icon(Icons.face),
       onTap: () {
         var route = new MaterialPageRoute(
