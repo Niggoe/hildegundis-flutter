@@ -30,8 +30,8 @@ android {
         applicationId "com.nigromar.hildegundisapp"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 4
-        versionName "1.5.2"
+        versionCode 5
+        versionName "1.5.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
