@@ -3,11 +3,11 @@ import 'package:hildegundis_app/views/DateView.dart';
 import 'package:hildegundis_app/views/spiessbuch.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/login.dart';
-
-void main() => runApp(new MaterialApp(home: new HomePage()));
+import 'package:hildegundis_app/main.dart';
 
 class HomePage extends StatefulWidget {
   static String tag = 'home-page';
+
   @override
   HomePageState createState() => new HomePageState();
 }
@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _page = 0;
-  
+
   PageController pageController;
 
   @override
@@ -38,7 +38,8 @@ class HomePageState extends State<HomePage>
         backgroundColor: Colors.indigo,
         actions: <Widget>[
           new IconButton(
-              icon: new Icon(Icons.do_not_disturb), onPressed: _pushSaved),
+              icon: new Icon(Icons.do_not_disturb),
+              onPressed: loggedOutPressed),
         ],
       ),
       bottomNavigationBar: new BottomNavigationBar(
@@ -64,9 +65,10 @@ class HomePageState extends State<HomePage>
     );
   }
 
-  void _pushSaved() {
-    FirebaseAuth.instance.signOut();
-    Navigator.of(context).pushReplacementNamed(LoginPage.tag);
+  void loggedOutPressed() {
+    FirebaseAuth.instance
+        .signOut()
+        .then((_) => Navigator.of(context).pushReplacementNamed(LoginPage.tag));
   }
 
   void navigationTapped(int page) {

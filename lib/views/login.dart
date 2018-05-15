@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/homescreen.dart';
-import 'package:hildegundis_app/auth.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
@@ -11,16 +10,12 @@ class LoginPage extends StatefulWidget {
   State<StatefulWidget> createState() => new _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> implements AuthStateListener {
+class _LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
-  BuildContext _ctx;
+
   String _email;
   String _password;
 
-  _LoginPageState() {
-    var authStateProvider = new AuthStateProvider();
-    authStateProvider.subscribe(this);
-  }
 
   bool validateAndSave() {
     final form = formKey.currentState;
@@ -38,9 +33,7 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
         FirebaseUser user = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: _email, password: _password);
         print("Signed in: ${user.uid}");
-        var authStateProvider = new AuthStateProvider();
-        authStateProvider.notify(AuthState.LOGGED_IN);
-        Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
+        Navigator.of(context).pushReplacementNamed(HomePage.tag);
       } catch (e) {
         print("Error $e");
       }
@@ -49,7 +42,7 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
 
   @override
   Widget build(BuildContext context) {
-    _ctx = context;
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Login Hildegundis APP"),
@@ -146,13 +139,6 @@ class _LoginPageState extends State<LoginPage> implements AuthStateListener {
   }
 
   void handleLoginWithoutCredentials() {
-    Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
-  }
-
-  @override
-  void onAuthStateChanged(AuthState state) {
-    if (state == AuthState.LOGGED_IN) {
-      Navigator.of(_ctx).pushReplacementNamed(HomePage.tag);
-    }
+    Navigator.of(context).pushReplacementNamed(HomePage.tag);
   }
 }

@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:hildegundis_app/views/login.dart';
 import 'package:hildegundis_app/views/homescreen.dart';
-import "dart:async";
-import 'package:firebase_auth/firebase_auth.dart';
+import "loginUtil.dart";
 
-void main() => runApp(new MyApp());
-
-class MyApp extends StatelessWidget {
+void main() async {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     HomePage.tag: (context) => HomePage()
   };
 
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-        title: 'Login Page',
-        theme: new ThemeData(
-          primarySwatch: Colors.indigo,
-        ),
-        routes: routes,
-        home: new LoginPage());
+  Widget _defaultHome = new LoginPage();
+  bool result = await userIsLoggedIn();
+  if (result) {
+    _defaultHome = new HomePage();
   }
+
+  runApp(new MaterialApp(
+      title: 'Login Page',
+      theme: new ThemeData(
+        primarySwatch: Colors.indigo,
+      ),
+      routes: routes,
+      home: _defaultHome)
+  );
 }
