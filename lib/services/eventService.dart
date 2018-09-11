@@ -38,7 +38,7 @@ class EventService {
   }
 
   Event _fromJson(String json) {
-    Map<String, dynamic> map = JSON.decode(json);
+    Map<String, dynamic> map = jsonDecode(json);
     var event = new Event();
     event.title = map["name"];
     event.clothes = map["clothes"];
@@ -55,7 +55,7 @@ class EventService {
     mapData["clothes"] = event.clothes;
     mapData["startdate"] = event.timepoint.toString();
     mapData["id"] = event.id;
-    String json = JSON.encode(mapData);
+    String json = jsonEncode(mapData);
     return json;
   }
 }

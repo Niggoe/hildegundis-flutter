@@ -53,7 +53,7 @@ class StrafeService {
   }
 
   Strafe _fromJson(String json) {
-    Map<String, dynamic> map = JSON.decode(json);
+    Map<String, dynamic> map = jsonDecode(json);
     var strafe = new Strafe();
     strafe.name = map["name"];
     strafe.betrag = map["betrag"];
@@ -70,7 +70,7 @@ class StrafeService {
     mapData["betrag"] = strafe.betrag;
     mapData["date"] = strafe.date.toString();
     mapData["id"] = strafe.id;
-    String json = JSON.encode(mapData);
+    String json = jsonEncode(mapData);
     return json;
   }
 }
