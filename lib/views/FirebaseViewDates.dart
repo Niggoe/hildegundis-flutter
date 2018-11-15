@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:intl/intl.dart";
-import "package:hildegundis_app/views/DateDetailView.dart";
+import "package:hildegundis_app/views/DetailPageDate.dart";
 import "package:hildegundis_app/constants.dart";
 import "dart:async";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:hildegundis_app/models/event.dart";
 import 'package:hildegundis_app/dialogs/addEventDialog.dart';
 
-class FirebaseView extends StatefulWidget {
-  static String tag = "firebase-view";
-  FirebaseViewState createState() => new FirebaseViewState();
+class FirebaseViewDate extends StatefulWidget {
+  static String tag = "firebase-view-dates";
+  FirebaseViewDateState createState() => new FirebaseViewDateState();
 }
 
 const allowedUsers = [
@@ -19,7 +19,8 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewState extends State<FirebaseView> {
+class FirebaseViewDateState extends State<FirebaseViewDate> {
+  
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     return new Card(
       elevation: 8.0,

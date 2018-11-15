@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:hildegundis_app/views/login.dart';
 import 'package:hildegundis_app/views/homescreen.dart';
-import 'package:hildegundis_app/views/FirebaseView.dart';
+import 'package:hildegundis_app/views/FirebaseViewDates.dart';
+import 'package:hildegundis_app/views/FirebaseViewTransactions.dart';
 import "loginUtil.dart";
 
 void main() async {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     HomePage.tag: (context) => HomePage(),
-    FirebaseView.tag: (context) => FirebaseView()
+    FirebaseViewDate.tag: (context) => FirebaseViewDate(),
+    FirebaseViewTransactions.tag: (context) => FirebaseViewTransactions()
   };
 
   Widget _defaultHome = new LoginPage();
   bool result = await userIsLoggedIn();
   if (result) {
-    _defaultHome = new FirebaseView();
+    _defaultHome = new LoginPage();
   }
 
   runApp(new MaterialApp(

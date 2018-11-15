@@ -110,11 +110,13 @@ class _LoginPageState extends State<LoginPage> {
         child: Material(
           borderRadius: BorderRadius.circular(30.0),
           shadowColor: Colors.lightBlueAccent.shade100,
+          clipBehavior: Clip.antiAlias,
           elevation: 5.0,
           child: MaterialButton(
             minWidth: 200.0,
             height: 42.0,
             onPressed: validateAndSubmit,
+            clipBehavior: Clip.antiAlias,
             color: Colors.indigoAccent,
             child: Text('Login', style: TextStyle(color: Colors.white)),
           ),
@@ -126,9 +128,11 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(30.0),
           shadowColor: Colors.redAccent.shade100,
           elevation: 5.0,
+          clipBehavior: Clip.antiAlias,
           child: MaterialButton(
             minWidth: 200.0,
             height: 42.0,
+            clipBehavior: Clip.antiAlias,
             onPressed: handleLoginWithoutCredentials,
             color: Colors.redAccent,
             child: Text('Ohne Login weiter', style: TextStyle(color: Colors.white)),

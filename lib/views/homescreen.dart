@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hildegundis_app/views/spiessbuch.dart';
+import 'package:hildegundis_app/views/FirebaseViewTransactions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/login.dart';
-import 'package:hildegundis_app/views/FirebaseView.dart';
+import 'package:hildegundis_app/views/FirebaseViewDates.dart';
 
 class HomePage extends StatefulWidget {
   static String tag = 'home-page';
@@ -53,7 +53,7 @@ class HomePageState extends State<HomePage>
         currentIndex: _page,
       ),
       body: new PageView(
-        children: <Widget>[new FirebaseView(), new BookView()],
+        children: <Widget>[new FirebaseViewDate(), new FirebaseViewTransactions()],
         controller: pageController,
         onPageChanged: (newPage) {
           setState(() {
