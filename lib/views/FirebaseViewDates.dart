@@ -7,6 +7,7 @@ import "dart:async";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:hildegundis_app/models/event.dart";
 import 'package:hildegundis_app/dialogs/addEventDialog.dart';
+import 'package:fcm_push/fcm_push.dart';
 
 class FirebaseViewDate extends StatefulWidget {
   static String tag = "firebase-view-dates";
@@ -111,6 +112,7 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
         }).catchError((e) {
           print(e);
         });
+        sendFCMMessage(addedEvent);
       }
     } else {
       final snackBar = new SnackBar(
@@ -120,6 +122,16 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
       Scaffold.of(context).showSnackBar(snackBar);
     }
   }
+
+    Future<int> sendFCMMessage(Event newEvent) async{
+    final FCM fcm = new FCM(ProjectConfig.serverKey);
+    final Message fcmMessage = new Message()
+    ..to = "/topics/all"
+    ..title = "Neuer Termin hinzugefügt"
+    ..body = newEvent.title + " \t" + DateFormat.yMMMd().format(newEvent.timepoint) + "\n" + newEvent.location;
+    await fcm.send(fcmMessage);
+  }
+
 
   Future handleLongPress(DocumentSnapshot document) async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();

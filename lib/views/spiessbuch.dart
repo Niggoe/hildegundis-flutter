@@ -18,6 +18,7 @@ const allowedUsers = ["tSFXWNgYNRhzFKXKw3xvaEhCsUB2", "q34qmsOSzWWR30I06omGJ3ti0
 class BookViewState extends State<BookView> {
   List<Strafe> data = new List();
   Map<String, List<Strafe>> perNameMap = new Map();
+
   StrafeService strafeService = new StrafeService();
   var formatter = new DateFormat("dd.MM.yyyy");
   bool _loadingData;

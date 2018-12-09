@@ -6,6 +6,7 @@ import "package:hildegundis_app/constants.dart";
 import "package:hildegundis_app/views/FirebaseViewDetailsTransactions.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:hildegundis_app/dialogs/addStrafeDialog.dart';
+import 'package:fcm_push/fcm_push.dart';
 
 class FirebaseViewTransactions extends StatefulWidget {
   static String tag = "firebase-view-transactions";
@@ -22,6 +23,7 @@ const allowedUsers = [
 
 class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
   List<Strafe> allTransactions = new List();
+  
 
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     Strafe currentStrafe = new Strafe();
@@ -76,6 +78,8 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
         }).catchError((e) {
           print(e);
         });
+
+        sendFCMMessage(addedStrafe);
       }
     } else {
       final snackBar = new SnackBar(
@@ -86,7 +90,14 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
     }
   }
 
-
+  Future<int> sendFCMMessage(Strafe strafeAdded) async{
+    final FCM fcm = new FCM(ProjectConfig.serverKey);
+    final Message fcmMessage = new Message()
+    ..to = "/topics/all"
+    ..title = "Neue Strafe hinzugefügt"
+    ..body = strafeAdded.name + " \t" + strafeAdded.betrag.toString() + "€\n" + strafeAdded.grund;
+    final String messageID = await fcm.send(fcmMessage);
+  }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var formatter = new DateFormat("dd.MM.yyyy");

@@ -26,6 +26,8 @@ class ProjectConfig {
 
   // Global 
   static const ColorAppBar = Colors.indigo;
+  static const serverKey = "AAAAb-jR3mU:APA91bF42NiOt1VJcSw_D3HFte-2lvQlmxxQnAbbc3ZFCnV6hzcZoks-uFtaaMzdnqGZiJko3w7ejo1pjEB490zuRgFknxk2EA856jhx2LL_Dp8e58yEZHlpFGqvPBJ7xhhtt2c59knV";
+
 
 
 

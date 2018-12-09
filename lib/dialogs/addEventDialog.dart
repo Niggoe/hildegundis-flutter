@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hildegundis_app/models/event.dart';
-import 'package:hildegundis_app/services/eventService.dart';
+import 'package:flutter/cupertino.dart';
 
 class AddEvent extends StatefulWidget {
   @override
   _AddEventState createState() => new _AddEventState();
 }
+
+const double _kPickerSheetHeight = 216.0;
 
 class _AddEventState extends State<AddEvent> {
   DateTime dateTimeDate;
@@ -26,6 +28,7 @@ class _AddEventState extends State<AddEvent> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+
     return new Scaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
@@ -128,38 +131,75 @@ class _AddEventState extends State<AddEvent> {
     }
   }
 
+  Widget _buildBottomPicker(Widget picker) {
+    return Container(
+      height: _kPickerSheetHeight,
+      padding: const EdgeInsets.only(top: 6.0),
+      color: CupertinoColors.white,
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: CupertinoColors.black,
+          fontSize: 22.0,
+        ),
+        child: GestureDetector(
+          // Blocks taps from propagating to the modal sheet and popping.
+          onTap: () {},
+          child: SafeArea(
+            top: false,
+            child: picker,
+          ),
+        ),
+      ),
+    );
+  }
+
   Future _chooseDate(BuildContext context, String initialDateString) async {
     var now = new DateTime.now();
     var initialDate = convertToDate(initialDateString) ?? now;
     initialDate = (initialDate.year >= 1900 && initialDate.isBefore(now)
         ? initialDate
         : now);
-
-    var result = await showDatePicker(
+    _controllerDate.text = DateFormat.yMMMd().format(initialDate);
+    dateTimeDate = initialDate;
+    showCupertinoModalPopup<void>(
         context: context,
-        initialDate: initialDate,
-
-        firstDate: new DateTime(1900),
-        lastDate: new DateTime(2030));
-
-    if (result == null) return;
-
-    setState(() {
-      _controllerDate.text = new DateFormat.yMd().format(result);
-      dateTimeDate = result;
-    });
+        builder: (BuildContext context) {
+          return _buildBottomPicker(CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: initialDate,
+            onDateTimeChanged: (DateTime newDateTime) {
+              setState(() {
+                _controllerDate.text = DateFormat.yMMMd().format(newDateTime);
+                dateTimeDate = newDateTime;
+              });
+            },
+          ));
+        });
   }
 
   Future _chooseTime(BuildContext context, String initialDateString) async {
-    final TimeOfDay time = new TimeOfDay.now();
-    var result = await showTimePicker(context: context, initialTime: time );
-
-    if (result == null) return;
-
-    setState(() {
-      _controllerTime.text = result.toString();
-      dateTimeTime = result;
-    });
+    var now = new DateTime.now();
+    var initialDate = convertToDate(initialDateString) ?? now;
+    initialDate = (initialDate.year >= 1900 && initialDate.isBefore(now)
+        ? initialDate
+        : now);
+    _controllerTime.text = DateFormat.Hm().format(initialDate);
+    dateTimeTime = TimeOfDay.fromDateTime(initialDate);
+    showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return _buildBottomPicker(CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.time,
+            initialDateTime: initialDate,
+            use24hFormat: true,
+            onDateTimeChanged: (DateTime newDateTime) {
+              setState(() {
+                _controllerTime.text = new DateFormat.Hm().format(newDateTime);
+                dateTimeTime = TimeOfDay.fromDateTime(newDateTime);
+              });
+            },
+          ));
+        });
   }
 
   void _submitForm() {
@@ -173,14 +213,6 @@ class _AddEventState extends State<AddEvent> {
       DateTime eventDate = new DateTime(dateTimeDate.year, dateTimeDate.month,
           dateTimeDate.day, dateTimeTime.hour, dateTimeTime.minute);
       newEvent.timepoint = eventDate;
-      try {
-        var eventService = new EventService();
-        eventService.createEvent(newEvent).then((value) =>
-            showMessage('Neues Event angelegt für ${value.title}', Colors.blue));
-      } catch (e) {
-        showMessage('Eintrag konnte nicht gespeichert werden ${e.toString()}',
-            Colors.red);
-      }
       Navigator.of(context).pop(newEvent);
     }
   }

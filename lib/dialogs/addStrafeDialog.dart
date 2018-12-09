@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:hildegundis_app/models/strafe.dart';
 import 'package:hildegundis_app/services/StrafeService.dart';
+import 'package:flutter/cupertino.dart';
 
 class DialogAddStrafe extends StatefulWidget {
   @override
   _DialogAddStrafeState createState() => new _DialogAddStrafeState();
 }
+
+const double _kPickerSheetHeight = 216.0;
 
 class _DialogAddStrafeState extends State<DialogAddStrafe> {
   Strafe newStrafe = new Strafe();
@@ -17,8 +20,8 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   List<String> _names = <String>[
     '',
-    'Daniel C.',
-    'Daniel T.',
+    'Daniel Coenen',
+    'Daniel Taubert',
     'Fabian',
     'Jonas',
     'Konstantin',
@@ -27,13 +30,37 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
     'Michael',
     'Nicolas',
     'Nikolas',
-    'Patrick',
+    'Patrick Wegner',
+    'Patrick Wirtz',
     'Roman',
-    'Thomas H.',
-    'Thomas W.',
+    'Sven',
+    'Thomas Hilser',
+    'Thomas Wallert',
   ];
 
   String _name = '';
+
+  Widget _buildBottomPicker(Widget picker) {
+    return Container(
+      height: _kPickerSheetHeight,
+      padding: const EdgeInsets.only(top: 6.0),
+      color: CupertinoColors.white,
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: CupertinoColors.black,
+          fontSize: 22.0,
+        ),
+        child: GestureDetector(
+          // Blocks taps from propagating to the modal sheet and popping.
+          onTap: () {},
+          child: SafeArea(
+            top: false,
+            child: picker,
+          ),
+        ),
+      ),
+    );
+  }
 
   Future _chooseDate(BuildContext context, String initialDateString) async {
     var now = new DateTime.now();
@@ -41,23 +68,27 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
     initialDate = (initialDate.year >= 1900 && initialDate.isBefore(now)
         ? initialDate
         : now);
+    _controller.text = new DateFormat.yMMMd().format(initialDate);
 
-    var result = await showDatePicker(
+    showCupertinoModalPopup<void>(
         context: context,
-        initialDate: initialDate,
-        firstDate: new DateTime(1900),
-        lastDate: new DateTime.now());
+        builder: (BuildContext context) {
+          return _buildBottomPicker(CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: initialDate,
 
-    if (result == null) return;
-
-    setState(() {
-      _controller.text = new DateFormat.yMd().format(result);
-    });
+            onDateTimeChanged: (DateTime newDateTime) {
+              setState(() {
+                _controller.text = new DateFormat.yMMMd().format(newDateTime);
+              });
+            },
+          ));
+        });
   }
 
   DateTime convertToDate(String input) {
     try {
-      var d = new DateFormat.yMd().parseStrict(input);
+      var d = new DateFormat.yMMMd().parseStrict(input);
       return d;
     } catch (e) {
       return null;

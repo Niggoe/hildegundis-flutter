@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _page = 0;
+  
 
   PageController pageController;
 
