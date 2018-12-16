@@ -55,18 +55,22 @@ class _LoginPageState extends State<LoginPage> {
 
     _firebaseMessaging.subscribeToTopic('all');
 
-    _firebaseMessaging.getToken().then((token) {
-      print("New Token: " + token);
-    });
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.onIosSettingsRegistered
         .listen((IosNotificationSettings settings) {
       print('Settings registred: $settings');
     });
+
+
+    _gSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) async {
+      if (account != null){
+        Navigator.of(context).pushReplacementNamed(HomePage.tag);  
+      } 
+    });
   }
 
-  showMessage(Map<String, dynamic> message) async{
+  showMessage(Map<String, dynamic> message) async {
     var android = new AndroidNotificationDetails(
         "channelID", "ChannelName", "channelDescription");
     var ios = new IOSNotificationDetails();
@@ -75,8 +79,8 @@ class _LoginPageState extends State<LoginPage> {
         0, "$message.title", "$message.body", platform);
   }
 
-  showMessageTest() async{
-        var android = new AndroidNotificationDetails(
+  showMessageTest() async {
+    var android = new AndroidNotificationDetails(
         "channelID", "ChannelName", "channelDescription");
     var ios = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, ios);
@@ -84,16 +88,20 @@ class _LoginPageState extends State<LoginPage> {
         0, "Test Notification", "Das ist der Inhalt", platform);
   }
 
-  Future<FirebaseUser> _signIN() async {
+  Future _signIN() async {
     GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
     GoogleSignInAuthentication authentication =
         await googleSignInAccount.authentication;
 
-    FirebaseUser user = await _fAuth.signInWithGoogle(
-        idToken: authentication.idToken,
-        accessToken: authentication.accessToken);
-    print(user);
-    return user;
+    try {
+      FirebaseUser user = await _fAuth.signInWithGoogle(
+          idToken: authentication.idToken,
+          accessToken: authentication.accessToken);
+      print(user);
+      Navigator.of(context).pushReplacementNamed(HomePage.tag);
+    } catch (e) {
+      print ("Error $e");
+    }
   }
 
   Future validateAndSubmit() async {
@@ -188,24 +196,24 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-      new Padding(
-        padding: EdgeInsets.symmetric(vertical: 2.0),
-        child: Material(
-          borderRadius: BorderRadius.circular(30.0),
-          shadowColor: Colors.redAccent.shade100,
-          elevation: 5.0,
-          clipBehavior: Clip.antiAlias,
-          child: MaterialButton(
-            minWidth: 200.0,
-            height: 42.0,
-            clipBehavior: Clip.antiAlias,
-            onPressed: handleLoginWithoutCredentials,
-            color: Colors.redAccent,
-            child: Text('Ohne Login weiter',
-                style: TextStyle(color: Colors.white)),
-          ),
-        ),
-      ),
+      // new Padding(
+      //   padding: EdgeInsets.symmetric(vertical: 2.0),
+      //   child: Material(
+      //     borderRadius: BorderRadius.circular(30.0),
+      //     shadowColor: Colors.redAccent.shade100,
+      //     elevation: 5.0,
+      //     clipBehavior: Clip.antiAlias,
+      //     child: MaterialButton(
+      //       minWidth: 200.0,
+      //       height: 42.0,
+      //       clipBehavior: Clip.antiAlias,
+      //       onPressed: handleLoginWithoutCredentials,
+      //       color: Colors.redAccent,
+      //       child: Text('Ohne Login weiter',
+      //           style: TextStyle(color: Colors.white)),
+      //     ),
+      //   ),
+      // ),
       new Padding(
         padding: EdgeInsets.symmetric(vertical: 2.0),
         child: Material(
@@ -220,23 +228,6 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: _signIN,
             color: Colors.redAccent,
             child: Text('Mit Google einloggen',
-                style: TextStyle(color: Colors.white)),
-          ),
-        ),
-      ), new Padding(
-        padding: EdgeInsets.symmetric(vertical: 2.0),
-        child: Material(
-          borderRadius: BorderRadius.circular(30.0),
-          shadowColor: Colors.redAccent.shade100,
-          elevation: 5.0,
-          clipBehavior: Clip.antiAlias,
-          child: MaterialButton(
-            minWidth: 200.0,
-            height: 42.0,
-            clipBehavior: Clip.antiAlias,
-            onPressed: showMessageTest,
-            color: Colors.redAccent,
-            child: Text('Test notification',
                 style: TextStyle(color: Colors.white)),
           ),
         ),

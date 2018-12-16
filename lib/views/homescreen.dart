@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hildegundis_app/views/FirebaseViewTransactions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hildegundis_app/views/FirebaseViewDates.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,7 +15,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _page = 0;
-  
+  final GoogleSignIn _gSignIn = new GoogleSignIn();
 
   PageController pageController;
 
@@ -54,7 +55,10 @@ class HomePageState extends State<HomePage>
         currentIndex: _page,
       ),
       body: new PageView(
-        children: <Widget>[new FirebaseViewDate(), new FirebaseViewTransactions()],
+        children: <Widget>[
+          new FirebaseViewDate(),
+          new FirebaseViewTransactions()
+        ],
         controller: pageController,
         onPageChanged: (newPage) {
           setState(() {
@@ -66,6 +70,7 @@ class HomePageState extends State<HomePage>
   }
 
   void loggedOutPressed() {
+    _gSignIn.signOut();
     FirebaseAuth.instance
         .signOut()
         .then((_) => Navigator.of(context).pushReplacementNamed(LoginPage.tag));

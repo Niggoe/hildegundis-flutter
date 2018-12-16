@@ -7,7 +7,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import "loginUtil.dart";
 
 void main() async {
-  
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     HomePage.tag: (context) => HomePage(),
@@ -23,10 +22,10 @@ void main() async {
 
   runApp(new MaterialApp(
       title: 'Login Page',
+      debugShowCheckedModeBanner: false,
       theme: new ThemeData(
         primarySwatch: Colors.indigo,
       ),
       routes: routes,
-      home: _defaultHome)
-  );
+      home: _defaultHome));
 }

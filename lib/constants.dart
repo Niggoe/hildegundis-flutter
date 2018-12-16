@@ -11,6 +11,7 @@ class ProjectConfig {
   static const TextFloatingActionButtonTooltipDateOverview = "Termin hinzufügen";
   static const TextNotLoggedInSnackbarMessage = "Bitte erst einloggen";
   static const TextNotAllowedDateEntry = "Leider darfst du keine Termine hinzufügen";
+  static const TextNotAllowedTransactionEntry = "Leider darfst du keine Strafen hinzufügen";
   static const TextNotAllowedDateRemoval = "Leider darfst du keine Termine löschen";
   static const SnackbarBackgroundColorDateOverview = Colors.red;
   static const TextDateOverviewTryToDeleteEvent = "Termin löschen?";

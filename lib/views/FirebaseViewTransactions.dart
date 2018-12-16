@@ -23,7 +23,6 @@ const allowedUsers = [
 
 class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
   List<Strafe> allTransactions = new List();
-  
 
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     Strafe currentStrafe = new Strafe();
@@ -51,51 +50,59 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
     );
   }
 
-
-    Future addEventPressed() async {
+  Future<bool> checkAllowedUser() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
       var user_id = user.uid;
       if (!allowedUsers.contains(user_id)) {
-        final snackBar = new SnackBar(
-          content: new Text("Leider darfst du keine Strafen hinzufügen"),
-          backgroundColor: Colors.red,
-        );
-        Scaffold.of(context).showSnackBar(snackBar);
+        return false;
       } else {
-        Strafe addedStrafe =
-            await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
-                builder: (BuildContext context) {
-                  return new DialogAddStrafe();
-                },
-                fullscreenDialog: true));
-        
-                final docRef = await Firestore.instance.collection("transactions").add({
-          'name': addedStrafe.name,
-          'reason': addedStrafe.grund,
-          'amount': addedStrafe.betrag,
-          'date': addedStrafe.date
-        }).catchError((e) {
-          print(e);
-        });
-
-        sendFCMMessage(addedStrafe);
+        return true;
       }
     } else {
+      return false;
+    }
+  }
+
+  Future addEventPressed() async {
+    bool allowed = await checkAllowedUser();
+    if (allowed) {
+      Strafe addedStrafe =
+          await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
+              builder: (BuildContext context) {
+                return new DialogAddStrafe();
+              },
+              fullscreenDialog: true));
+
+      final docRef = await Firestore.instance.collection("transactions").add({
+        'name': addedStrafe.name,
+        'reason': addedStrafe.grund,
+        'amount': addedStrafe.betrag,
+        'date': addedStrafe.date
+      }).catchError((e) {
+        print(e);
+      });
+
+      sendFCMMessage(addedStrafe);
+    } else {
       final snackBar = new SnackBar(
-        content: new Text("Bitte erst einloggen"),
-        backgroundColor: Colors.red,
+        content: new Text(ProjectConfig.TextNotAllowedTransactionEntry),
+        backgroundColor: ProjectConfig.SnackbarBackgroundColorDateOverview,
       );
       Scaffold.of(context).showSnackBar(snackBar);
     }
   }
 
-  Future<int> sendFCMMessage(Strafe strafeAdded) async{
+  Future<int> sendFCMMessage(Strafe strafeAdded) async {
     final FCM fcm = new FCM(ProjectConfig.serverKey);
     final Message fcmMessage = new Message()
-    ..to = "/topics/all"
-    ..title = "Neue Strafe hinzugefügt"
-    ..body = strafeAdded.name + " \t" + strafeAdded.betrag.toString() + "€\n" + strafeAdded.grund;
+      ..to = "/topics/all"
+      ..title = "Neue Strafe hinzugefügt"
+      ..body = strafeAdded.name +
+          " \t" +
+          strafeAdded.betrag.toString() +
+          "€\n" +
+          strafeAdded.grund;
     final String messageID = await fcm.send(fcmMessage);
   }
 
@@ -103,6 +110,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
     var formatter = new DateFormat("dd.MM.yyyy");
     var date = document['date'];
     var datestring = formatter.format(date);
+    bool payed = document['payed'];
 
     return new ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -134,14 +142,35 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
         new Text(document['reason'],
             style: TextStyle(color: ProjectConfig.IconColorDateOverview))
       ]),
-      trailing: Icon(Icons.keyboard_arrow_right,
-          color: ProjectConfig.FontColorDateOverview, size: 30.0),
+      trailing: IconButton(
+        icon: (payed ? Icon(Icons.attach_money) : Icon(Icons.money_off)),
+        color: (payed ? Colors.green[500] : Colors.red[500]),
+        onPressed: () {
+          _togglePayed(document);
+        },
+      ),
       onTap: () {
         var nameKey = document['name'];
         getDocuments(nameKey);
       },
       //onLongPress: () => handleLongPress(document),
     );
+  }
+
+  Future _togglePayed(DocumentSnapshot document) async{
+    if (await checkAllowedUser()){
+      final docRef = await Firestore.instance.collection("transactions").document(document.documentID).updateData({
+        'payed': !document['payed']
+      }).catchError((e) {
+        print(e);
+      });
+    } else{
+      final snackBar = new SnackBar(
+        content: new Text(ProjectConfig.TextNotAllowedTransactionEntry),
+        backgroundColor: ProjectConfig.SnackbarBackgroundColorDateOverview,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 
   Future<QuerySnapshot> getDocuments(nameKey) async {
@@ -153,23 +182,22 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
     List<DocumentSnapshot> listOfDocuments = snapshot.documents;
     double totalAmount = 0.0;
     List<Strafe> strafePerName = [];
-    for (DocumentSnapshot current in listOfDocuments){
-        totalAmount += current["amount"];
-        Strafe currentStrafe = new Strafe();
-        currentStrafe.name = current["name"];
-        currentStrafe.date = current["date"];
-        currentStrafe.betrag = current["amount"];
-        currentStrafe.grund = current["reason"];
-        strafePerName.add(currentStrafe);
+    for (DocumentSnapshot current in listOfDocuments) {
+      totalAmount += current["amount"];
+      Strafe currentStrafe = new Strafe();
+      currentStrafe.name = current["name"];
+      currentStrafe.date = current["date"];
+      currentStrafe.betrag = current["amount"];
+      currentStrafe.grund = current["reason"];
+      strafePerName.add(currentStrafe);
     }
     var route = new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                new FirebaseViewDetailsTransactions(
-                  name: nameKey,
-                  strafePerName: strafePerName,
-                  amount: totalAmount,
-                ));
-        Navigator.of(context).push(route);
+        builder: (BuildContext context) => new FirebaseViewDetailsTransactions(
+              name: nameKey,
+              strafePerName: strafePerName,
+              amount: totalAmount,
+            ));
+    Navigator.of(context).push(route);
     return snapshot;
   }
 
@@ -179,7 +207,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
     return new Scaffold(
       floatingActionButton: new FloatingActionButton(
         onPressed: () {
-           addEventPressed();
+          addEventPressed();
         },
         child: new Icon(Icons.add),
         tooltip: ProjectConfig.TextFloatingActionButtonTooltipDateOverview,
