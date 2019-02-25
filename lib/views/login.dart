@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
 
@@ -16,7 +17,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final formKey = new GlobalKey<FormState>();
   final FirebaseAuth _fAuth = FirebaseAuth.instance;
-  final GoogleSignIn _gSignIn = new GoogleSignIn();
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       new FlutterLocalNotificationsPlugin();
@@ -61,13 +61,6 @@ class _LoginPageState extends State<LoginPage> {
         .listen((IosNotificationSettings settings) {
       print('Settings registred: $settings');
     });
-
-
-    _gSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) async {
-      if (account != null){
-        Navigator.of(context).pushReplacementNamed(HomePage.tag);  
-      } 
-    });
   }
 
   showMessage(Map<String, dynamic> message) async {
@@ -86,22 +79,6 @@ class _LoginPageState extends State<LoginPage> {
     var platform = new NotificationDetails(android, ios);
     await flutterLocalNotificationsPlugin.show(
         0, "Test Notification", "Das ist der Inhalt", platform);
-  }
-
-  Future _signIN() async {
-    GoogleSignInAccount googleSignInAccount = await _gSignIn.signIn();
-    GoogleSignInAuthentication authentication =
-        await googleSignInAccount.authentication;
-
-    try {
-      FirebaseUser user = await _fAuth.signInWithGoogle(
-          idToken: authentication.idToken,
-          accessToken: authentication.accessToken);
-      print(user);
-      Navigator.of(context).pushReplacementNamed(HomePage.tag);
-    } catch (e) {
-      print ("Error $e");
-    }
   }
 
   Future validateAndSubmit() async {
@@ -158,17 +135,23 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
       SizedBox(height: 12.0),
-      new TextFormField(
+      new Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+        child: new TextFormField(
         decoration: new InputDecoration(
             labelText: 'Email',
             contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))),
         validator: (value) => value.isEmpty ? 'Email cannot be empty' : null,
-        onSaved: (value) => _email = value,
+        onSaved: (value) => _email = value.trim(),
       ),
+      )
+      ,
       SizedBox(height: 8.0),
-      new TextFormField(
+      new Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+        child: new TextFormField(
         decoration: new InputDecoration(
             labelText: 'Passwort',
             contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -178,60 +161,21 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: true,
         onSaved: (value) => _password = value,
       ),
-      SizedBox(height: 8.0),
-      new Padding(
-        padding: EdgeInsets.symmetric(vertical: 16.0),
-        child: Material(
-          borderRadius: BorderRadius.circular(30.0),
-          shadowColor: Colors.lightBlueAccent.shade100,
-          clipBehavior: Clip.antiAlias,
-          elevation: 5.0,
-          child: MaterialButton(
-            minWidth: 200.0,
-            height: 42.0,
-            onPressed: validateAndSubmit,
-            clipBehavior: Clip.antiAlias,
-            color: Colors.indigoAccent,
-            child: Text('Login', style: TextStyle(color: Colors.white)),
-          ),
-        ),
-      ),
-      // new Padding(
-      //   padding: EdgeInsets.symmetric(vertical: 2.0),
-      //   child: Material(
-      //     borderRadius: BorderRadius.circular(30.0),
-      //     shadowColor: Colors.redAccent.shade100,
-      //     elevation: 5.0,
-      //     clipBehavior: Clip.antiAlias,
-      //     child: MaterialButton(
-      //       minWidth: 200.0,
-      //       height: 42.0,
-      //       clipBehavior: Clip.antiAlias,
-      //       onPressed: handleLoginWithoutCredentials,
-      //       color: Colors.redAccent,
-      //       child: Text('Ohne Login weiter',
-      //           style: TextStyle(color: Colors.white)),
-      //     ),
-      //   ),
-      // ),
-      new Padding(
-        padding: EdgeInsets.symmetric(vertical: 2.0),
-        child: Material(
-          borderRadius: BorderRadius.circular(30.0),
-          shadowColor: Colors.redAccent.shade100,
-          elevation: 5.0,
-          clipBehavior: Clip.antiAlias,
-          child: MaterialButton(
-            minWidth: 200.0,
-            height: 42.0,
-            clipBehavior: Clip.antiAlias,
-            onPressed: _signIN,
-            color: Colors.redAccent,
-            child: Text('Mit Google einloggen',
-                style: TextStyle(color: Colors.white)),
-          ),
-        ),
       )
+      ,
+      SizedBox(height: 4.0),
+      new Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 28.0, 0.0, 0.0),
+        child: new RaisedButton(
+          elevation: 5.0,
+          // minWidth: 200.0,
+          // height: 42.0,
+          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+          onPressed: validateAndSubmit,
+          color: Colors.indigoAccent,
+          child: Text('Login', style: TextStyle(color: Colors.white)),
+          ),
+        ),
     ];
   }
 

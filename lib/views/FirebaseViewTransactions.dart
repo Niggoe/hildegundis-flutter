@@ -78,7 +78,8 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
         'name': addedStrafe.name,
         'reason': addedStrafe.grund,
         'amount': addedStrafe.betrag,
-        'date': addedStrafe.date
+        'date': addedStrafe.date,
+        'payed':addedStrafe.payed
       }).catchError((e) {
         print(e);
       });

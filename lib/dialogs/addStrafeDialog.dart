@@ -14,7 +14,6 @@ const double _kPickerSheetHeight = 216.0;
 
 class _DialogAddStrafeState extends State<DialogAddStrafe> {
   Strafe newStrafe = new Strafe();
-
   final TextEditingController _controller = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
@@ -187,6 +186,7 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
 
   void _submitForm() {
     final FormState form = _formKey.currentState;
+    newStrafe.payed = false;
     if (!form.validate()) {
       showMessage('Es ist nicht alles ausgefüllt - Bitte korrigieren');
     } else {

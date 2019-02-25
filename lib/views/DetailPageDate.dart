@@ -39,35 +39,53 @@ class _State extends State<DetailPageDate> {
         decoration: BoxDecoration(
             borderRadius: new BorderRadius.all(const Radius.circular(15.0))),
         child: new Column(children: <Widget>[
-          new Row(
-            children: <Widget>[
-              new Text(
-                widget.snapshot['name'],
-                style: TextStyle(
-                    color: ProjectConfig.FontColorDateDetail,
-                    fontSize: ProjectConfig.FontSizeHeaderDateDetail,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
+          new Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Text(
+                  widget.snapshot['name'],
+                  style: TextStyle(
+                      color: ProjectConfig.FontColorDateDetail,
+                      fontSize: ProjectConfig.FontSizeHeaderDateDetail,
+                      fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
           ),
-          new Row(
-            children: <Widget>[
-              new Text(formatter.format(widget.snapshot['date']) + " Uhr",
-                  style: TextStyle(color: ProjectConfig.FontColorDateDetail, fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
-            ],
+          new Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Text(formatter.format(widget.snapshot['date']) + " Uhr",
+                    style: TextStyle(
+                        color: ProjectConfig.FontColorDateDetail,
+                        fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
+              ],
+            ),
           ),
-          new Row(
-            children: <Widget>[
-              new Text(widget.snapshot['location'],
-                  style: TextStyle(color: ProjectConfig.FontColorDateDetail, fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
-            ],
+          new Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Text("Ort: "  + widget.snapshot['location'],
+                    style: TextStyle(
+                        color: ProjectConfig.FontColorDateDetail,
+                        fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
+              ],
+            ),
           ),
-          new Row(
-            children: <Widget>[
-              new Text(widget.snapshot['clothes'],
-                  style: TextStyle(color: ProjectConfig.FontColorDateDetail, fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
-            ],
-          ),
+          new Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+            child: new Row(
+              children: <Widget>[
+                new Text("Kleidung: " + widget.snapshot['clothes'],
+                    style: TextStyle(
+                        color: ProjectConfig.FontColorDateDetail,
+                        fontSize: ProjectConfig.FontSizeSubHeaderDateDetail))
+              ],
+            ),
+          )
         ]),
       ),
     );

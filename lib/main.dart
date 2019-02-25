@@ -17,7 +17,7 @@ void main() async {
   Widget _defaultHome = new LoginPage();
   bool result = await userIsLoggedIn();
   if (result) {
-    _defaultHome = new LoginPage();
+    _defaultHome = new HomePage();
   }
 
   runApp(new MaterialApp(

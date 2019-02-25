@@ -81,8 +81,6 @@ class FirebaseViewDetailsTransactionsState
         new Text(currentStrafe.grund,
             style: TextStyle(color: ProjectConfig.IconColorDateOverview))
       ]),
-            trailing: Icon(Icons.keyboard_arrow_right,
-          color: ProjectConfig.FontColorDateOverview, size: 30.0),
       //onLongPress: () => handleLongPress(document),
     );
   }

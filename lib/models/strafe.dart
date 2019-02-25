@@ -2,6 +2,7 @@ class Strafe {
   String name;
   DateTime date;
   String grund;
+  bool payed;
   double betrag;
   int id;
 
@@ -10,6 +11,7 @@ class Strafe {
         name = other.name,
         date = other.date,
         grund = other.grund,
+        payed = other.payed,
         id = other.id;
 
   Strafe();
