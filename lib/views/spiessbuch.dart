@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:hildegundis_app/dialogs/addStrafeDialog.dart';
-import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/modelsOLD/strafe.dart';
 import 'package:hildegundis_app/services/StrafeService.dart';
 import 'SpiessDetailView.dart';
 

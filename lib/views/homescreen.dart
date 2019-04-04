@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hildegundis_app/views/FirebaseViewDates.dart';
+import 'package:hildegundis_app/views/FormationView.dart';
 
 class HomePage extends StatefulWidget {
   static String tag = 'home-page';
@@ -49,6 +50,8 @@ class HomePageState extends State<HomePage>
               icon: new Icon(Icons.calendar_today), title: new Text("Termine")),
           new BottomNavigationBarItem(
               icon: new Icon(Icons.book), title: new Text("Spießbuch")),
+          new BottomNavigationBarItem(
+              icon: new Icon(Icons.face), title: new Text("Aufstellung"))
         ],
         fixedColor: Colors.red,
         onTap: navigationTapped,
@@ -57,7 +60,8 @@ class HomePageState extends State<HomePage>
       body: new PageView(
         children: <Widget>[
           new FirebaseViewDate(),
-          new FirebaseViewTransactions()
+          new FirebaseViewTransactions(),
+          new FormationView()
         ],
         controller: pageController,
         onPageChanged: (newPage) {

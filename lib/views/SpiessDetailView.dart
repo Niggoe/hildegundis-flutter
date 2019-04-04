@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/modelsOLD/strafe.dart';
 import 'package:intl/intl.dart';
 import 'package:hildegundis_app/services/StrafeService.dart';
 

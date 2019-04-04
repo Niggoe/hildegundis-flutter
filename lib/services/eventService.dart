@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:hildegundis_app/models/event.dart';
+import 'package:hildegundis_app/modelsOLD/event.dart';
 
 class EventService {
   static const _serviceUrl = 'https://www.hildegundisapp.de/';
@@ -24,7 +24,6 @@ class EventService {
 
   Future<Event> deleteEvent(Event event) async {
     try {
-      String json = _toJson(event);
       final response = await http.delete(
           _serviceUrl + "dateRemove/" + event.id.toString(),
           headers: _headers);

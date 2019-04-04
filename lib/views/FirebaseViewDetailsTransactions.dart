@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/modelsOLD/strafe.dart';
 import "package:intl/intl.dart";
 import "package:hildegundis_app/constants.dart";
-import "dart:async";
 
 class FirebaseViewDetailsTransactions extends StatefulWidget {
   static String tag = "firebase-detail-view-transactions";
@@ -27,8 +25,6 @@ const allowedUsers = [
 
 class FirebaseViewDetailsTransactionsState
     extends State<FirebaseViewDetailsTransactions> {
-
-
   Widget _makeCard(BuildContext context, Strafe strafe) {
     return new Card(
       elevation: 8.0,
@@ -75,12 +71,24 @@ class FirebaseViewDetailsTransactionsState
             Icon(Icons.linear_scale,
                 color: ProjectConfig.IconColorDateOverview),
             Text(datestring,
-                style: TextStyle(color: ProjectConfig.FontColorDateOverview))
+                style: TextStyle(color: ProjectConfig.FontColorDateOverview)),
+            Padding(
+              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+            ),
+            Text(
+              currentStrafe.betrag.toString() + "€",
+              style: TextStyle(color: ProjectConfig.FontColorDateOverview),
+            )
           ],
         ),
         new Text(currentStrafe.grund,
             style: TextStyle(color: ProjectConfig.IconColorDateOverview))
       ]),
+      trailing: IconButton(
+          icon: (currentStrafe.payed
+              ? Icon(Icons.attach_money)
+              : Icon(Icons.money_off)),
+          color: (currentStrafe.payed ? Colors.green[500] : Colors.red[500])),
       //onLongPress: () => handleLongPress(document),
     );
   }
@@ -118,8 +126,7 @@ class FirebaseViewDetailsTransactionsState
     return new ListView.builder(
         itemCount: widget.strafePerName.length,
         itemBuilder: (BuildContext context, index) {
-          if (index < keys.length)
-            return _makeCard(context, keys[index]);
+          if (index < keys.length) return _makeCard(context, keys[index]);
           //if (index < data.length) return buildRow(data[index], index);
         });
   }

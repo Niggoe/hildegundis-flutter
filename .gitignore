@@ -9,7 +9,11 @@
 .pub/
 .idea/
 .dart-tool/
+.history/
+.vscode/
 build/
+.idea/libraries
+
 
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
@@ -20,3 +24,24 @@ doc/api/
 
 
 # End of https://www.gitignore.io/api/dart
+.DS_Store
+.flutter-plugins
+pubspec.lock
+pubspec.lock.old
+.idea/libraries/Dart_SDK.xml
+.idea/libraries/Flutter_Plugins.xml
+android/.project
+android/.settings/org.eclipse.buildship.core.prefs
+android/app/.classpath
+android/app/.project
+android/app/.settings/org.eclipse.buildship.core.prefs
+android/gradle/wrapper/gradle-wrapper.properties
+ios/Podfile
+ios/Podfile.lock
+ios/Runner/AppDelegate.m
+ios/Runner/Info.plist
+ios/Runner/Runner.entitlements
+ios/Runner.xcodeproj/project.pbxproj
+ios/Runner.xcodeproj/xcshareddata/xcschemes/ReleaseApp.xcscheme
+ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings

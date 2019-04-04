@@ -5,7 +5,7 @@ import "package:hildegundis_app/views/DetailPageDate.dart";
 import "package:hildegundis_app/constants.dart";
 import "dart:async";
 import "package:firebase_auth/firebase_auth.dart";
-import "package:hildegundis_app/models/event.dart";
+import "package:hildegundis_app/modelsOLD/event.dart";
 import 'package:hildegundis_app/dialogs/addEventDialog.dart';
 import 'package:fcm_push/fcm_push.dart';
 

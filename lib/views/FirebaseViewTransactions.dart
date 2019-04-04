@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hildegundis_app/models/strafe.dart';
+import 'package:hildegundis_app/modelsOLD/strafe.dart';
 import "package:intl/intl.dart";
 import "package:hildegundis_app/constants.dart";
 import "package:hildegundis_app/views/FirebaseViewDetailsTransactions.dart";
@@ -137,7 +137,9 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
             Icon(Icons.linear_scale,
                 color: ProjectConfig.IconColorDateOverview),
             Text(datestring,
-                style: TextStyle(color: ProjectConfig.FontColorDateOverview))
+                style: TextStyle(color: ProjectConfig.FontColorDateOverview)),
+            Padding(padding: EdgeInsets.fromLTRB(30, 0, 0, 0),),
+            Text(document["amount"].toString() + "€", style: TextStyle(color: ProjectConfig.FontColorDateOverview),)
           ],
         ),
         new Text(document['reason'],
@@ -190,6 +192,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
       currentStrafe.date = current["date"];
       currentStrafe.betrag = current["amount"];
       currentStrafe.grund = current["reason"];
+      currentStrafe.payed = current["payed"];
       strafePerName.add(currentStrafe);
     }
     var route = new MaterialPageRoute(

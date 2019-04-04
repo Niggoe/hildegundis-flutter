@@ -3,7 +3,6 @@ import 'package:hildegundis_app/views/login.dart';
 import 'package:hildegundis_app/views/homescreen.dart';
 import 'package:hildegundis_app/views/FirebaseViewDates.dart';
 import 'package:hildegundis_app/views/FirebaseViewTransactions.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import "loginUtil.dart";
 
 void main() async {

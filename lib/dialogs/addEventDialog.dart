@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:hildegundis_app/models/event.dart';
+import 'package:hildegundis_app/modelsOLD/event.dart';
 import 'package:flutter/cupertino.dart';
 
 class AddEvent extends StatefulWidget {
