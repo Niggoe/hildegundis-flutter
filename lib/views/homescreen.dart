@@ -5,6 +5,7 @@ import 'package:hildegundis_app/views/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hildegundis_app/views/FirebaseViewDates.dart';
 import 'package:hildegundis_app/views/FormationView.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   static String tag = 'home-page';
@@ -40,8 +41,14 @@ class HomePageState extends State<HomePage>
         backgroundColor: Colors.indigo,
         actions: <Widget>[
           new IconButton(
-              icon: new Icon(Icons.do_not_disturb),
-              onPressed: loggedOutPressed),
+              icon: new Icon(Icons.texture),
+              tooltip: "Show impressum",
+              onPressed: showimpressum),
+          new IconButton(
+            icon: new Icon(Icons.do_not_disturb),
+            onPressed: loggedOutPressed,
+            tooltip: "Logout",
+          ),
         ],
       ),
       bottomNavigationBar: new BottomNavigationBar(
@@ -78,6 +85,15 @@ class HomePageState extends State<HomePage>
     FirebaseAuth.instance
         .signOut()
         .then((_) => Navigator.of(context).pushReplacementNamed(LoginPage.tag));
+  }
+
+  void showimpressum() async {
+    const url = "http://nigromarmedia.de/index.php/impressum/";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   void navigationTapped(int page) {
