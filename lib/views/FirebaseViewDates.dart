@@ -8,6 +8,8 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:hildegundis_app/modelsOLD/event.dart";
 import 'package:hildegundis_app/dialogs/addEventDialog.dart';
 import 'package:fcm_push/fcm_push.dart';
+import 'package:hildegundis_app/blocs/EventScreenBlocProvider.dart';
+import 'package:hildegundis_app/blocs/EventScreenBloc.dart';
 
 class FirebaseViewDate extends StatefulWidget {
   static String tag = "firebase-view-dates";
@@ -21,6 +23,19 @@ const allowedUsers = [
 ];
 
 class FirebaseViewDateState extends State<FirebaseViewDate> {
+  EventScreenBloc _bloc;
+
+  @override
+  void didChangeDependencies(){
+    super.didChangeDependencies();
+    _bloc = EventScreenBlocProvider.of(context);
+  }
+
+  @override
+  void dispose(){
+    _bloc.dispose();
+    super.dispose();
+  }
   
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     return new Card(
@@ -194,11 +209,7 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
         tooltip: ProjectConfig.TextFloatingActionButtonTooltipDateOverview,
       ),
       body: new StreamBuilder(
-          stream: Firestore.instance
-              .collection('events')
-              .where('date', isGreaterThanOrEqualTo: new DateTime.now())
-              .orderBy('date')
-              .snapshots(),
+          stream: _bloc.getAllEvents(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const Text('Loading...');
             return new ListView.builder(

@@ -7,4 +7,6 @@ class Repository {
 
   Future<void> uploadNewDate(Event toAdd) =>
       _firestoreProvider.uploadNewDate(toAdd);
+
+  Stream<QuerySnapshot> getAllEvents() => _firestoreProvider.getAllEvents();
 }

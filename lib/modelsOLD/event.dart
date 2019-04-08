@@ -5,6 +5,9 @@ class Event{
   DateTime timepoint;
   int id;
 
+  String getTitle(){
+    return this.title;
+  }
 
   @override
   String toString() {
