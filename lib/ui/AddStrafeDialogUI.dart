@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:hildegundis_app/modelsOLD/strafe.dart';
-import 'package:hildegundis_app/services/StrafeService.dart';
+import 'package:hildegundis_app/models/Strafe.dart';
 import 'package:flutter/cupertino.dart';
 
-class DialogAddStrafe extends StatefulWidget {
+class AddStrafeDialogUI extends StatefulWidget {
   @override
-  _DialogAddStrafeState createState() => new _DialogAddStrafeState();
+  _AddStrafeDialogUIState createState() => new _AddStrafeDialogUIState();
 }
 
 const double _kPickerSheetHeight = 216.0;
 
-class _DialogAddStrafeState extends State<DialogAddStrafe> {
+class _AddStrafeDialogUIState extends State<AddStrafeDialogUI> {
   Strafe newStrafe = new Strafe();
   final TextEditingController _controller = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -200,14 +199,6 @@ class _DialogAddStrafeState extends State<DialogAddStrafe> {
       print('========================================');
 
       newStrafe.id = DateTime.now().millisecondsSinceEpoch;
-      try {
-        var strafeService = new StrafeService();
-        strafeService.createStrafe(newStrafe).then((value) =>
-            showMessage('Neue Strafe angelegt für ${value.name}', Colors.blue));
-      } catch (e) {
-        showMessage('Eintrag konnte nicht gespeichert werden ${e.toString()}',
-            Colors.red);
-      }
       Navigator.of(context).pop(newStrafe);
     }
   }

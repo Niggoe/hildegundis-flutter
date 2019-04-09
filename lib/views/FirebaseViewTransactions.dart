@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hildegundis_app/modelsOLD/strafe.dart';
 import "package:intl/intl.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import 'package:hildegundis_app/ui/AddStrafeDialogUI.dart';
 import "package:hildegundis_app/constants.dart";
 import "package:hildegundis_app/views/FirebaseViewDetailsTransactions.dart";
-import "package:firebase_auth/firebase_auth.dart";
-import 'package:hildegundis_app/dialogs/addStrafeDialog.dart';
+import 'package:hildegundis_app/models/Strafe.dart';
 import 'package:fcm_push/fcm_push.dart';
 
-class FirebaseViewTransactions extends StatefulWidget {
-  static String tag = "firebase-view-transactions";
+class FirebaseViewStrafes extends StatefulWidget {
+  static String tag = "firebase-view-Strafes";
 
-  FirebaseViewTransactionsState createState() =>
-      new FirebaseViewTransactionsState();
+  FirebaseViewStrafesState createState() =>
+      new FirebaseViewStrafesState();
 }
 
 const allowedUsers = [
@@ -21,8 +21,8 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
-  List<Strafe> allTransactions = new List();
+class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
+  List<Strafe> allStrafes = new List();
 
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     Strafe currentStrafe = new Strafe();
@@ -70,11 +70,11 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
       Strafe addedStrafe =
           await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
               builder: (BuildContext context) {
-                return new DialogAddStrafe();
+                return new AddStrafeDialogUI();
               },
               fullscreenDialog: true));
 
-      final docRef = await Firestore.instance.collection("transactions").add({
+      final docRef = await Firestore.instance.collection("Strafes").add({
         'name': addedStrafe.name,
         'reason': addedStrafe.grund,
         'amount': addedStrafe.betrag,
@@ -162,7 +162,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
 
   Future _togglePayed(DocumentSnapshot document) async{
     if (await checkAllowedUser()){
-      final docRef = await Firestore.instance.collection("transactions").document(document.documentID).updateData({
+      final docRef = await Firestore.instance.collection("Strafes").document(document.documentID).updateData({
         'payed': !document['payed']
       }).catchError((e) {
         print(e);
@@ -178,7 +178,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
 
   Future<QuerySnapshot> getDocuments(nameKey) async {
     QuerySnapshot snapshot = await Firestore.instance
-        .collection('transactions')
+        .collection('Strafes')
         .where("name", isEqualTo: nameKey)
         .orderBy('date')
         .getDocuments();
@@ -196,7 +196,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
       strafePerName.add(currentStrafe);
     }
     var route = new MaterialPageRoute(
-        builder: (BuildContext context) => new FirebaseViewDetailsTransactions(
+        builder: (BuildContext context) => new FirebaseViewDetailsStrafes(
               name: nameKey,
               strafePerName: strafePerName,
               amount: totalAmount,
@@ -218,7 +218,7 @@ class FirebaseViewTransactionsState extends State<FirebaseViewTransactions> {
       ),
       body: new StreamBuilder(
           stream: Firestore.instance
-              .collection('transactions')
+              .collection('Strafes')
               .orderBy('date')
               .snapshots(),
           builder: (context, snapshot) {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hildegundis_app/modelsOLD/event.dart';
+import 'package:hildegundis_app/models/event.dart';
 
 class FirestoreProvider {
   Firestore _firestore = Firestore.instance;
@@ -12,6 +12,22 @@ class FirestoreProvider {
       'date': toAdd.timepoint
     }).catchError((e) {
       print(e);
+    });
+  }
+
+  Future<void> deleteDate(DocumentSnapshot document) async {
+    return await _firestore
+        .collection('events')
+        .document(document.documentID)
+        .delete();
+  }
+
+  Future<DocumentReference> addEvent(Event addedEvent) async {
+    return await _firestore.collection("events").add({
+      'name': addedEvent.title,
+      'clothes': addedEvent.clothes,
+      'location': addedEvent.location,
+      'date': addedEvent.timepoint
     });
   }
 

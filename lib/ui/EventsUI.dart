@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:intl/intl.dart";
-import "package:hildegundis_app/views/DetailPageDate.dart";
+import "package:hildegundis_app/ui/EventDetailUI.dart";
 import "package:hildegundis_app/constants.dart";
 import "dart:async";
 import "package:firebase_auth/firebase_auth.dart";
-import "package:hildegundis_app/modelsOLD/event.dart";
-import 'package:hildegundis_app/dialogs/addEventDialog.dart';
+import "package:hildegundis_app/models/event.dart";
+import 'package:hildegundis_app/ui/AddEventDialogUI.dart';
 import 'package:fcm_push/fcm_push.dart';
 import 'package:hildegundis_app/blocs/EventScreenBlocProvider.dart';
 import 'package:hildegundis_app/blocs/EventScreenBloc.dart';
 
-class FirebaseViewDate extends StatefulWidget {
+class EventsUI extends StatefulWidget {
   static String tag = "firebase-view-dates";
-  FirebaseViewDateState createState() => new FirebaseViewDateState();
+  _EventsUIState createState() => new _EventsUIState();
 }
 
 const allowedUsers = [
@@ -22,21 +22,21 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewDateState extends State<FirebaseViewDate> {
+class _EventsUIState extends State<EventsUI> {
   EventScreenBloc _bloc;
 
   @override
-  void didChangeDependencies(){
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _bloc = EventScreenBlocProvider.of(context);
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _bloc.dispose();
     super.dispose();
   }
-  
+
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
     return new Card(
       elevation: 8.0,
@@ -88,7 +88,7 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
       onTap: () {
         var route = new MaterialPageRoute(
             builder: (BuildContext context) =>
-                new DetailPageDate(snapshot: document));
+                new EventDetailUI(snapshot: document));
         Navigator.of(context).push(route);
       },
       onLongPress: () => handleLongPress(document),
@@ -115,18 +115,11 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
         Event addedEvent =
             await Navigator.of(context).push(new MaterialPageRoute<Event>(
                 builder: (BuildContext context) {
-                  return new AddEvent();
+                  return new AddEventDialogUI();
                 },
                 fullscreenDialog: true));
 
-        final docRef = await Firestore.instance.collection("events").add({
-          'name': addedEvent.title,
-          'clothes': addedEvent.clothes,
-          'location': addedEvent.location,
-          'date': addedEvent.timepoint
-        }).catchError((e) {
-          print(e);
-        });
+        _bloc.addEvent(addedEvent);
         sendFCMMessage(addedEvent);
       }
     } else {
@@ -138,15 +131,18 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
     }
   }
 
-    Future<int> sendFCMMessage(Event newEvent) async{
+  Future<int> sendFCMMessage(Event newEvent) async {
     final FCM fcm = new FCM(ProjectConfig.serverKey);
     final Message fcmMessage = new Message()
-    ..to = "/topics/all"
-    ..title = "Neuer Termin hinzugefügt"
-    ..body = newEvent.title + " \t" + DateFormat.yMMMd().format(newEvent.timepoint) + "\n" + newEvent.location;
+      ..to = "/topics/all"
+      ..title = "Neuer Termin hinzugefügt"
+      ..body = newEvent.title +
+          " \t" +
+          DateFormat.yMMMd().format(newEvent.timepoint) +
+          "\n" +
+          newEvent.location;
     await fcm.send(fcmMessage);
   }
-
 
   Future handleLongPress(DocumentSnapshot document) async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
@@ -168,13 +164,7 @@ class FirebaseViewDateState extends State<FirebaseViewDate> {
                 actions: <Widget>[
                   new FlatButton(
                       onPressed: () {
-                        Firestore.instance
-                            .collection('events')
-                            .document(document.documentID)
-                            .delete()
-                            .catchError((e) {
-                          print(e);
-                        });
+                        _bloc.deleteEvent(document);
                         Navigator.pop(context);
                       },
                       child: new Text(

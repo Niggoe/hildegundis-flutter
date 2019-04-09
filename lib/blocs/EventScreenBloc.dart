@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hildegundis_app/resources/repository.dart';
-import 'package:hildegundis_app/modelsOLD/event.dart';
+import 'package:hildegundis_app/models/event.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
@@ -17,6 +17,15 @@ class EventScreenBloc {
       sink.add(events);
     }
   });
+
+
+  Future<void> deleteEvent(DocumentSnapshot document){
+    return _repository.deleteDate(document);
+  }
+
+  Future<DocumentReference> addEvent(Event newEvent){
+    return _repository.addNewDate(newEvent);
+  }
 
   Stream<QuerySnapshot> getAllEvents() {
     return _repository.getAllEvents();

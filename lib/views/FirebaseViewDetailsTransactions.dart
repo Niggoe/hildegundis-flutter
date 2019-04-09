@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:hildegundis_app/modelsOLD/strafe.dart';
+import 'package:hildegundis_app/models/Strafe.dart';
 import "package:intl/intl.dart";
 import "package:hildegundis_app/constants.dart";
 
-class FirebaseViewDetailsTransactions extends StatefulWidget {
-  static String tag = "firebase-detail-view-transactions";
+class FirebaseViewDetailsStrafes extends StatefulWidget {
+  static String tag = "firebase-detail-view-Strafes";
   final String name;
   final List<Strafe> strafePerName;
   final double amount;
 
-  FirebaseViewDetailsTransactions(
+  FirebaseViewDetailsStrafes(
       {Key key, this.name, this.amount, this.strafePerName})
       : super(key: key);
 
-  FirebaseViewDetailsTransactionsState createState() =>
-      new FirebaseViewDetailsTransactionsState();
+  FirebaseViewDetailsStrafesState createState() =>
+      new FirebaseViewDetailsStrafesState();
 }
 
 const allowedUsers = [
@@ -23,8 +23,8 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewDetailsTransactionsState
-    extends State<FirebaseViewDetailsTransactions> {
+class FirebaseViewDetailsStrafesState
+    extends State<FirebaseViewDetailsStrafes> {
   Widget _makeCard(BuildContext context, Strafe strafe) {
     return new Card(
       elevation: 8.0,

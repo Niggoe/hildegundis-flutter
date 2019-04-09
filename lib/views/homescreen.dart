@@ -3,7 +3,7 @@ import 'package:hildegundis_app/views/FirebaseViewTransactions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hildegundis_app/views/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hildegundis_app/views/FirebaseViewDates.dart';
+import 'package:hildegundis_app/ui/EventsUI.dart';
 import 'package:hildegundis_app/views/FormationView.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,8 +66,8 @@ class HomePageState extends State<HomePage>
       ),
       body: new PageView(
         children: <Widget>[
-          new FirebaseViewDate(),
-          new FirebaseViewTransactions(),
+          new EventsUI(),
+          new FirebaseViewStrafes(),
           new FormationView()
         ],
         controller: pageController,

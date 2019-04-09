@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
-import "package:hildegundis_app/modelsOLD/DragPicture.dart";
-import "package:hildegundis_app/modelsOLD/FormationPosition.dart";
+import "package:hildegundis_app/models/DragPicture.dart";
+import "package:hildegundis_app/models/FormationPosition.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'dart:math';

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hildegundis_app/services/StrafeService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hildegundis_app/constants.dart';
 
-class DetailPageDate extends StatefulWidget {
+class EventDetailUI extends StatefulWidget {
   @override
-  _State createState() => new _State();
+  _EventDetailUIState createState() => new _EventDetailUIState();
   final DocumentSnapshot snapshot;
-  DetailPageDate({Key key, this.snapshot}) : super(key: key);
+  EventDetailUI({Key key, this.snapshot}) : super(key: key);
 }
 
-class _State extends State<DetailPageDate> {
-  StrafeService strafeService = new StrafeService();
+class _EventDetailUIState extends State<EventDetailUI> {
 
   @override
   Widget build(BuildContext context) {

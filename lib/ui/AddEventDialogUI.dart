@@ -1,18 +1,17 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:hildegundis_app/modelsOLD/event.dart';
+import 'package:hildegundis_app/models/event.dart';
 import 'package:flutter/cupertino.dart';
 
-class AddEvent extends StatefulWidget {
+class AddEventDialogUI extends StatefulWidget {
   @override
-  _AddEventState createState() => new _AddEventState();
+  _AddEventDialogUIState createState() => new _AddEventDialogUIState();
 }
 
 const double _kPickerSheetHeight = 216.0;
 
-class _AddEventState extends State<AddEvent> {
+class _AddEventDialogUIState extends State<AddEventDialogUI> {
   DateTime dateTimeDate;
   TimeOfDay dateTimeTime = new TimeOfDay.now();
   String date;
