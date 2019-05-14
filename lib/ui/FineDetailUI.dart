@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hildegundis_app/models/Strafe.dart';
+import 'package:hildegundis_app/models/Fine.dart';
 import "package:intl/intl.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:hildegundis_app/constants.dart";
+import "package:hildegundis_app/blocs/FineScreenBloc.dart";
+import "package:hildegundis_app/blocs/FineScreenBlocProvider.dart";
 
-class FirebaseViewDetailsStrafes extends StatefulWidget {
+class FineDetailUI extends StatefulWidget {
   static String tag = "firebase-detail-view-Strafes";
   final String name;
-  final List<Strafe> strafePerName;
-  final double amount;
 
-  FirebaseViewDetailsStrafes(
-      {Key key, this.name, this.amount, this.strafePerName})
+  FineDetailUI({Key key, this.name})
       : super(key: key);
 
-  FirebaseViewDetailsStrafesState createState() =>
-      new FirebaseViewDetailsStrafesState();
+  FineDetailUIState createState() => new FineDetailUIState();
 }
 
 const allowedUsers = [
@@ -23,9 +22,20 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewDetailsStrafesState
-    extends State<FirebaseViewDetailsStrafes> {
-  Widget _makeCard(BuildContext context, Strafe strafe) {
+class FineDetailUIState extends State<FineDetailUI> {
+  FineScreenBloc _bloc;
+
+  Widget _makeCard(BuildContext context, DocumentSnapshot document) {
+    Fine currentStrafe = new Fine();
+    currentStrafe.date = document["date"] == '' ? null : document["date"];
+    currentStrafe.name = document['name'];
+    currentStrafe.reason = document["reason"];
+    currentStrafe.payed = document["payed"];
+    if (document["amount"].runtimeType == int) {
+      currentStrafe.amount = document["amount"].toDouble();
+    } else {
+      currentStrafe.amount = document["amount"];
+    }
     return new Card(
       elevation: 8.0,
       shape: RoundedRectangleBorder(
@@ -37,12 +47,12 @@ class FirebaseViewDetailsStrafesState
         decoration: BoxDecoration(
             color: ProjectConfig.BoxDecorationColorDateOverview,
             borderRadius: new BorderRadius.all(const Radius.circular(15.0))),
-        child: _buildListItem(context, strafe),
+        child: _buildListItem(context, currentStrafe),
       ),
     );
   }
 
-  Widget _buildListItem(BuildContext context, Strafe currentStrafe) {
+  Widget _buildListItem(BuildContext context, Fine currentStrafe) {
     var formatter = new DateFormat("dd.MM.yyyy");
     var date = currentStrafe.date;
     var datestring = formatter.format(date);
@@ -76,12 +86,12 @@ class FirebaseViewDetailsStrafesState
               padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
             ),
             Text(
-              currentStrafe.betrag.toString() + "€",
+              currentStrafe.amount.toString() + "€",
               style: TextStyle(color: ProjectConfig.FontColorDateOverview),
             )
           ],
         ),
-        new Text(currentStrafe.grund,
+        new Text(currentStrafe.reason,
             style: TextStyle(color: ProjectConfig.IconColorDateOverview))
       ]),
       trailing: IconButton(
@@ -100,11 +110,6 @@ class FirebaseViewDetailsStrafesState
         title: new Column(
           children: <Widget>[
             new Text(widget.name),
-            new Text(
-              "Summe " + widget.amount.toString(),
-              style: new TextStyle(
-                  fontSize: ProjectConfig.FontSizeSubHeaderDateDetail),
-            )
           ],
         ),
         backgroundColor: Colors.indigo,
@@ -122,12 +127,23 @@ class FirebaseViewDetailsStrafesState
   }
 
   Widget buildBody() {
-    var keys = widget.strafePerName;
-    return new ListView.builder(
-        itemCount: widget.strafePerName.length,
-        itemBuilder: (BuildContext context, index) {
-          if (index < keys.length) return _makeCard(context, keys[index]);
-          //if (index < data.length) return buildRow(data[index], index);
-        });
+    return new StreamBuilder(
+      stream: _bloc.getAllFinesForName(widget.name),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const Text('Loading...');
+        return new ListView.builder(
+            itemCount: snapshot.data.documents.length,
+            itemBuilder: (BuildContext context, index) {
+              return _makeCard(context, snapshot.data.documents[index]);
+              //if (index < data.length) return buildRow(data[index], index);
+            });
+      },
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = FineScreenBlocProvider.of(context);
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:hildegundis_app/resources/repository.dart';
 import 'package:hildegundis_app/models/event.dart';
 import 'package:rxdart/rxdart.dart';
@@ -18,12 +17,11 @@ class EventScreenBloc {
     }
   });
 
-
-  Future<void> deleteEvent(DocumentSnapshot document){
+  Future<void> deleteEvent(DocumentSnapshot document) {
     return _repository.deleteDate(document);
   }
 
-  Future<DocumentReference> addEvent(Event newEvent){
+  Future<DocumentReference> addEvent(Event newEvent) {
     return _repository.addNewDate(newEvent);
   }
 

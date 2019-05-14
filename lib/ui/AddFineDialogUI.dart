@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:hildegundis_app/models/Strafe.dart';
+import 'package:hildegundis_app/models/Fine.dart';
 import 'package:flutter/cupertino.dart';
 
-class AddStrafeDialogUI extends StatefulWidget {
+class AddFineDialogUI extends StatefulWidget {
   @override
-  _AddStrafeDialogUIState createState() => new _AddStrafeDialogUIState();
+  _AddFineDialogUIState createState() => new _AddFineDialogUIState();
 }
 
 const double _kPickerSheetHeight = 216.0;
 
-class _AddStrafeDialogUIState extends State<AddStrafeDialogUI> {
-  Strafe newStrafe = new Strafe();
+class _AddFineDialogUIState extends State<AddFineDialogUI> {
+  Fine newStrafe = new Fine();
   final TextEditingController _controller = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
@@ -164,7 +164,7 @@ class _AddStrafeDialogUIState extends State<AddStrafeDialogUI> {
               validator: (val) =>
                   val.isEmpty ? 'Ein Grund wird benötigt' : null,
               onSaved: (String value) {
-                newStrafe.grund = value;
+                newStrafe.reason = value;
               },
             ),
             new TextFormField(
@@ -174,7 +174,7 @@ class _AddStrafeDialogUIState extends State<AddStrafeDialogUI> {
               validator: (val) =>
                   val.isEmpty ? 'Ein Betrag wird benötigt' : null,
               onSaved: (String value) {
-                newStrafe.betrag = double.parse(value.replaceAll(",", "."));
+                newStrafe.amount = double.parse(value.replaceAll(",", "."));
               },
             )
           ].toList(),
@@ -194,8 +194,8 @@ class _AddStrafeDialogUIState extends State<AddStrafeDialogUI> {
       print('Form save called, newContact is now up to date...');
       print('Name: ${newStrafe.name}');
       print('Datum: ${newStrafe.date}');
-      print('Grund: ${newStrafe.grund}');
-      print('Betrag: ${newStrafe.betrag}');
+      print('Grund: ${newStrafe.reason}');
+      print('Betrag: ${newStrafe.amount}');
       print('========================================');
 
       newStrafe.id = DateTime.now().millisecondsSinceEpoch;

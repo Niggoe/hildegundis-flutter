@@ -3,19 +3,22 @@ import "package:hildegundis_app/models/DragPicture.dart";
 import "package:hildegundis_app/models/FormationPosition.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_auth/firebase_auth.dart";
+import 'package:hildegundis_app/blocs/FormationUIBloc.dart';
+import 'package:hildegundis_app/blocs/FormationUIBlocProvider.dart';
 import 'dart:math';
 
-class FormationView extends StatefulWidget {
+class FormationUI extends StatefulWidget {
   static String tag = "formation-view";
   @override
-  FormationViewState createState() => new FormationViewState();
+  FormationUIState createState() => new FormationUIState();
 }
 
-class FormationViewState extends State<FormationView> {
+class FormationUIState extends State<FormationUI> {
   String name = "";
   int formation = 0;
   bool loggedIn = false;
   Map<int, FormationPosition> allPositionsMap = new Map();
+  FormationUIBloc _bloc;
 
   void moveBall(FormationPosition newPosition) {
     Map<int, FormationPosition> allUsers = new Map();
@@ -42,11 +45,11 @@ class FormationViewState extends State<FormationView> {
         newPosition.documentID = pos.documentID;
         updateRemove(pos, newPosition);
         int lowestValue = allPositionsMap.keys.reduce(min);
-        if (lowestValue == 0){
+        if (lowestValue == 0) {
           lowestValue = -1;
         }
-        newPosition.position =lowestValue;
-        allUsers.putIfAbsent(lowestValue -1, () => newPosition);
+        newPosition.position = lowestValue;
+        allUsers.putIfAbsent(lowestValue - 1, () => newPosition);
       }
     }
     setState(() {
@@ -55,22 +58,12 @@ class FormationViewState extends State<FormationView> {
     });
   }
 
-   Future updateRemove(FormationPosition old, FormationPosition newPos) async {
-    await Firestore.instance
-        .collection('formation')
-        .document(old.documentID)
-        .updateData({'position': -1}).catchError((e) {
-      print(e);
-    });
+  Future updateRemove(FormationPosition old, FormationPosition newPos) async {
+    _bloc.removePosition(old, newPos);
   }
 
   Future updatePosition(FormationPosition old, FormationPosition newPos) async {
-    await Firestore.instance
-        .collection('formation')
-        .document(old.documentID)
-        .updateData({'position': newPos.position}).catchError((e) {
-      print(e);
-    });
+    _bloc.updatePosition(old, newPos);
   }
 
   Future<QuerySnapshot> getDocuments(formation) async {
@@ -104,8 +97,13 @@ class FormationViewState extends State<FormationView> {
     List<Widget> notAssignedUser = new List();
     for (FormationPosition currentPosition in this.allPositionsMap.values) {
       if (currentPosition.position < 0) {
-        notAssignedUser.add(MovableBall(currentPosition.position, true,
-            moveBall, currentPosition.name, currentPosition.documentID, loggedIn));
+        notAssignedUser.add(MovableBall(
+            currentPosition.position,
+            true,
+            moveBall,
+            currentPosition.name,
+            currentPosition.documentID,
+            loggedIn));
       }
     }
     return notAssignedUser;
@@ -166,28 +164,33 @@ class FormationViewState extends State<FormationView> {
 
   MovableBall createSlot(int position) {
     if (allPositionsMap.containsKey(position)) {
-      return new MovableBall(position, true, moveBall,
-          allPositionsMap[position].name, allPositionsMap[position].documentID, loggedIn);
+      return new MovableBall(
+          position,
+          true,
+          moveBall,
+          allPositionsMap[position].name,
+          allPositionsMap[position].documentID,
+          loggedIn);
     } else {
       return new MovableBall(position, false, moveBall, "", "", loggedIn);
     }
   }
 
   Future checkUserId() async {
-  FirebaseUser user = await FirebaseAuth.instance.currentUser();
-  if (user != null) {
-    var user_id = user.uid;
-    print (user_id);
-    if (!allowedUsers.contains(user_id)) {
-      print("False");
-    } else {
-      print("True");
-      setState(() {
-        loggedIn = true;
-      });
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    if (user != null) {
+      var user_id = user.uid;
+      print(user_id);
+      if (!allowedUsers.contains(user_id)) {
+        print("False");
+      } else {
+        print("True");
+        setState(() {
+          loggedIn = true;
+        });
+      }
     }
   }
-}
 
   @override
   void initState() {
@@ -203,5 +206,11 @@ class FormationViewState extends State<FormationView> {
         children: getFormationPositions(),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = FormationUIBlocProvider.of(context);
   }
 }

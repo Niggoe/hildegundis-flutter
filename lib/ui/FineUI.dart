@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:intl/intl.dart";
 import "package:firebase_auth/firebase_auth.dart";
-import 'package:hildegundis_app/ui/AddStrafeDialogUI.dart';
+import 'package:hildegundis_app/ui/AddFineDialogUI.dart';
 import "package:hildegundis_app/constants.dart";
-import "package:hildegundis_app/views/FirebaseViewDetailsTransactions.dart";
-import 'package:hildegundis_app/models/Strafe.dart';
+import "package:hildegundis_app/ui/FineDetailUI.dart";
+import 'package:hildegundis_app/models/Fine.dart';
 import 'package:fcm_push/fcm_push.dart';
+import 'package:hildegundis_app/blocs/FineScreenBloc.dart';
+import 'package:hildegundis_app/blocs/FineScreenBlocProvider.dart';
 
-class FirebaseViewStrafes extends StatefulWidget {
+class FineUI extends StatefulWidget {
   static String tag = "firebase-view-Strafes";
 
-  FirebaseViewStrafesState createState() =>
-      new FirebaseViewStrafesState();
+  FineUIState createState() => new FineUIState();
 }
 
 const allowedUsers = [
@@ -21,18 +22,19 @@ const allowedUsers = [
   "v8qunIYGqhNnGPUdykHqFs2ABYW2"
 ];
 
-class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
-  List<Strafe> allStrafes = new List();
+class FineUIState extends State<FineUI> {
+  List<Fine> allStrafes = new List();
+  FineScreenBloc _bloc;
 
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
-    Strafe currentStrafe = new Strafe();
+    Fine currentStrafe = new Fine();
     currentStrafe.date = document["date"] == '' ? null : document["date"];
     currentStrafe.name = document['name'];
-    currentStrafe.grund = document["reason"];
+    currentStrafe.reason = document["reason"];
     if (document["amount"].runtimeType == int) {
-      currentStrafe.betrag = document["amount"].toDouble();
+      currentStrafe.amount = document["amount"].toDouble();
     } else {
-      currentStrafe.betrag = document["amount"];
+      currentStrafe.amount = document["amount"];
     }
 
     return new Card(
@@ -67,24 +69,15 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
   Future addEventPressed() async {
     bool allowed = await checkAllowedUser();
     if (allowed) {
-      Strafe addedStrafe =
-          await Navigator.of(context).push(new MaterialPageRoute<Strafe>(
+      Fine addedFine =
+          await Navigator.of(context).push(new MaterialPageRoute<Fine>(
               builder: (BuildContext context) {
-                return new AddStrafeDialogUI();
+                return new AddFineDialogUI();
               },
               fullscreenDialog: true));
 
-      final docRef = await Firestore.instance.collection("Strafes").add({
-        'name': addedStrafe.name,
-        'reason': addedStrafe.grund,
-        'amount': addedStrafe.betrag,
-        'date': addedStrafe.date,
-        'payed':addedStrafe.payed
-      }).catchError((e) {
-        print(e);
-      });
-
-      sendFCMMessage(addedStrafe);
+      _bloc.addNewFine(addedFine);
+      sendFCMMessage(addedFine);
     } else {
       final snackBar = new SnackBar(
         content: new Text(ProjectConfig.TextNotAllowedTransactionEntry),
@@ -94,16 +87,16 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
     }
   }
 
-  Future<int> sendFCMMessage(Strafe strafeAdded) async {
+  Future<int> sendFCMMessage(Fine strafeAdded) async {
     final FCM fcm = new FCM(ProjectConfig.serverKey);
     final Message fcmMessage = new Message()
       ..to = "/topics/all"
       ..title = "Neue Strafe hinzugefügt"
       ..body = strafeAdded.name +
           " \t" +
-          strafeAdded.betrag.toString() +
+          strafeAdded.amount.toString() +
           "€\n" +
-          strafeAdded.grund;
+          strafeAdded.reason;
     final String messageID = await fcm.send(fcmMessage);
   }
 
@@ -138,8 +131,13 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
                 color: ProjectConfig.IconColorDateOverview),
             Text(datestring,
                 style: TextStyle(color: ProjectConfig.FontColorDateOverview)),
-            Padding(padding: EdgeInsets.fromLTRB(30, 0, 0, 0),),
-            Text(document["amount"].toString() + "€", style: TextStyle(color: ProjectConfig.FontColorDateOverview),)
+            Padding(
+              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+            ),
+            Text(
+              document["amount"].toString() + "€",
+              style: TextStyle(color: ProjectConfig.FontColorDateOverview),
+            )
           ],
         ),
         new Text(document['reason'],
@@ -160,14 +158,10 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
     );
   }
 
-  Future _togglePayed(DocumentSnapshot document) async{
-    if (await checkAllowedUser()){
-      final docRef = await Firestore.instance.collection("Strafes").document(document.documentID).updateData({
-        'payed': !document['payed']
-      }).catchError((e) {
-        print(e);
-      });
-    } else{
+  Future _togglePayed(DocumentSnapshot document) async {
+    if (await checkAllowedUser()) {
+      _bloc.togglePayed(document);
+    } else {
       final snackBar = new SnackBar(
         content: new Text(ProjectConfig.TextNotAllowedTransactionEntry),
         backgroundColor: ProjectConfig.SnackbarBackgroundColorDateOverview,
@@ -176,38 +170,25 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
     }
   }
 
-  Future<QuerySnapshot> getDocuments(nameKey) async {
-    QuerySnapshot snapshot = await Firestore.instance
-        .collection('Strafes')
-        .where("name", isEqualTo: nameKey)
-        .orderBy('date')
-        .getDocuments();
-    List<DocumentSnapshot> listOfDocuments = snapshot.documents;
-    double totalAmount = 0.0;
-    List<Strafe> strafePerName = [];
-    for (DocumentSnapshot current in listOfDocuments) {
-      totalAmount += current["amount"];
-      Strafe currentStrafe = new Strafe();
-      currentStrafe.name = current["name"];
-      currentStrafe.date = current["date"];
-      currentStrafe.betrag = current["amount"];
-      currentStrafe.grund = current["reason"];
-      currentStrafe.payed = current["payed"];
-      strafePerName.add(currentStrafe);
-    }
+  void getDocuments(nameKey){
     var route = new MaterialPageRoute(
-        builder: (BuildContext context) => new FirebaseViewDetailsStrafes(
-              name: nameKey,
-              strafePerName: strafePerName,
-              amount: totalAmount,
+        builder: (BuildContext context) => new FineScreenBlocProvider(
+              child: FineDetailUI(
+                name: nameKey
+              ),
             ));
     Navigator.of(context).push(route);
-    return snapshot;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bloc = FineScreenBlocProvider.of(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List<Strafe>> perNameMap = new Map();
+    Map<String, List<Fine>> perNameMap = new Map();
     return new Scaffold(
       floatingActionButton: new FloatingActionButton(
         onPressed: () {
@@ -217,10 +198,7 @@ class FirebaseViewStrafesState extends State<FirebaseViewStrafes> {
         tooltip: ProjectConfig.TextFloatingActionButtonTooltipDateOverview,
       ),
       body: new StreamBuilder(
-          stream: Firestore.instance
-              .collection('Strafes')
-              .orderBy('date')
-              .snapshots(),
+          stream: _bloc.getAllFines(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const Text('Loading...');
             return new ListView.builder(

@@ -1,23 +1,23 @@
-class Strafe {
+class Fine {
   String name;
   DateTime date;
-  String grund;
+  String reason;
   bool payed;
-  double betrag;
+  double amount;
   int id;
 
-  Strafe.from(Strafe other)
-      : betrag = other.betrag,
+  Fine.from(Fine other)
+      : amount = other.amount,
         name = other.name,
         date = other.date,
-        grund = other.grund,
+        reason = other.reason,
         payed = other.payed,
         id = other.id;
 
-  Strafe();
+  Fine();
 
   @override
   String toString() {
-    return "Name: ${this.name} Betrag: ${this.betrag}";
+    return "Name: ${this.name} Betrag: ${this.amount}";
   }
 }
