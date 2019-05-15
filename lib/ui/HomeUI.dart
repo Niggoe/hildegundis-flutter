@@ -10,6 +10,7 @@ import 'package:hildegundis_app/blocs/FineScreenBlocProvider.dart';
 import 'package:hildegundis_app/blocs/BottomNavBarBloc.dart';
 import 'package:hildegundis_app/blocs/EventScreenBlocProvider.dart';
 import 'package:hildegundis_app/blocs/FormationUIBlocProvider.dart';
+import 'package:hildegundis_app/ui/ShowSongbookUI.dart';
 
 class HomePageUI extends StatefulWidget {
   static String tag = 'home-page';
@@ -107,6 +108,8 @@ class HomePageUIState extends State<HomePageUI> {
                 return FormationUIBlocProvider(
                   child: FormationUI(),
                 );
+              case NavBarItem.SONGBOOK:
+                return SongbookUI();
             }
           },
         ),
@@ -117,15 +120,44 @@ class HomePageUIState extends State<HomePageUI> {
             return BottomNavigationBar(
               fixedColor: Colors.red,
               onTap: _bottomNavBarBloc.pickItem,
+              type: BottomNavigationBarType.shifting,
               currentIndex: snapshot.data.index,
               items: [
                 new BottomNavigationBarItem(
-                    icon: new Icon(Icons.calendar_today),
-                    title: new Text("Termine")),
+                    activeIcon:
+                        new Icon(Icons.calendar_today, color: Colors.red),
+                    icon: new Icon(Icons.calendar_today, color: Colors.indigo),
+                    title: new Text(
+                      "Termine",
+                      style: TextStyle(color: Colors.red),
+                    )),
                 new BottomNavigationBarItem(
-                    icon: new Icon(Icons.book), title: new Text("Spießbuch")),
+                    activeIcon: new Icon(Icons.book, color: Colors.red),
+                    icon: new Icon(Icons.book, color: Colors.indigo),
+                    title: new Text(
+                      "Spießbuch",
+                      style: TextStyle(color: Colors.red),
+                    )),
                 new BottomNavigationBarItem(
-                    icon: new Icon(Icons.face), title: new Text("Aufstellung"))
+                    activeIcon: new Icon(Icons.face, color: Colors.red),
+                    icon: new Icon(
+                      Icons.face,
+                      color: Colors.indigo,
+                    ),
+                    title: new Text(
+                      "Aufstellung",
+                      style: TextStyle(color: Colors.red),
+                    )),
+                new BottomNavigationBarItem(
+                    activeIcon: new Icon(Icons.music_note, color: Colors.red),
+                    icon: new Icon(
+                      Icons.music_note,
+                      color: Colors.indigo,
+                    ),
+                    title: new Text(
+                      "Liederbuch",
+                      style: TextStyle(color: Colors.red),
+                    ))
               ],
             );
           },

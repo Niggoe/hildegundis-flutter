@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hildegundis_app/resources/repository.dart';
 
-enum NavBarItem { EVENTS, FINES, FORMATION }
+enum NavBarItem { EVENTS, FINES, FORMATION, SONGBOOK }
 
 class BottomNavBarBloc {
   final StreamController<NavBarItem> _navBarController =
@@ -22,6 +22,10 @@ class BottomNavBarBloc {
         break;
       case 2:
         _navBarController.sink.add(NavBarItem.FORMATION);
+        break;
+      case 3:
+        _navBarController.sink.add(NavBarItem.SONGBOOK);
+        break;
     }
   }
 
