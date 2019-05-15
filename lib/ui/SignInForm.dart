@@ -27,9 +27,20 @@ class SignInFormState extends State<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
+    _bloc.checkUserIsAuthenticated().then((logged) => logged
+        ? Navigator.of(context).pushReplacementNamed(HomePageUI.tag)
+        : print("No user logged in"));
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        new CircleAvatar(
+          backgroundColor: Colors.transparent,
+          backgroundImage: new AssetImage('assets/AppLogo.png'),
+          radius: 50.0,
+        ),
+        SizedBox(
+          height: 100.0,
+        ),
         emailField(),
         Container(margin: EdgeInsets.only(top: 5.0, bottom: 5.0)),
         passwordField(),
@@ -96,7 +107,6 @@ class SignInFormState extends State<SignInForm> {
   void authenticateUser() {
     _bloc.submit().then((value) {
       if (value == 1) {
-        _bloc.showProgressBar(true);
         Navigator.of(context).pushReplacementNamed(HomePageUI.tag);
       } else {
         // error happened

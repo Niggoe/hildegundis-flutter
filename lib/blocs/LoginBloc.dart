@@ -53,6 +53,10 @@ class LoginBloc {
     return _repository.registerUser(_email.value, _password.value);
   }
 
+  Future<bool> checkUserIsAuthenticated() {
+    return _repository.checkLoginUser();
+  }
+
   void cancelLogin() {
     _isSignedIn.drain();
   }

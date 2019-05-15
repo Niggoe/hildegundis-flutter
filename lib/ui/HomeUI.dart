@@ -80,7 +80,7 @@ class HomePageUIState extends State<HomePageUI> {
           backgroundColor: Colors.indigo,
           actions: <Widget>[
             new IconButton(
-                icon: new Icon(Icons.texture),
+                icon: new Icon(Icons.info_outline),
                 tooltip: "Show impressum",
                 onPressed: showimpressum),
             new IconButton(

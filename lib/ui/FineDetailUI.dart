@@ -10,8 +10,7 @@ class FineDetailUI extends StatefulWidget {
   static String tag = "firebase-detail-view-Strafes";
   final String name;
 
-  FineDetailUI({Key key, this.name})
-      : super(key: key);
+  FineDetailUI({Key key, this.name}) : super(key: key);
 
   FineDetailUIState createState() => new FineDetailUIState();
 }
@@ -94,10 +93,7 @@ class FineDetailUIState extends State<FineDetailUI> {
         new Text(currentStrafe.reason,
             style: TextStyle(color: ProjectConfig.IconColorDateOverview))
       ]),
-      trailing: IconButton(
-          icon: (currentStrafe.payed
-              ? Icon(Icons.attach_money)
-              : Icon(Icons.money_off)),
+      trailing: Icon(currentStrafe.payed ? Icons.attach_money : Icons.money_off,
           color: (currentStrafe.payed ? Colors.green[500] : Colors.red[500])),
       //onLongPress: () => handleLongPress(document),
     );

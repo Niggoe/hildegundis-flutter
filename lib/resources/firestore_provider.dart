@@ -105,6 +105,19 @@ class FirestoreProvider {
     }
   }
 
+  Future<bool> checkAuthenticated() async {
+    try {
+      var user = await FirebaseAuth.instance.currentUser();
+      print(user);
+      bool loggedIn = user != null;
+      print(loggedIn.toString() + " user state");
+      return (user != null);
+    } catch (e) {
+      print("Error $e");
+      return false;
+    }
+  }
+
   Future<void> registerUser(String email, String password) async {
     return _firestore
         .collection("users")
@@ -113,6 +126,7 @@ class FirestoreProvider {
   }
 
   Future<void> logoutUser() async {
+    print("log out user");
     FirebaseAuth.instance.signOut();
   }
 }

@@ -11,14 +11,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(accentColor: Colors.blue, primaryColor: Colors.green),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Gesellschaft Hildegundis von Meer 2016",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.indigo,
-          elevation: 0.0,
-        ),
         body: LoginScreen(),
       ),
       routes: {
