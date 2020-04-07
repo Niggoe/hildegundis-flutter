@@ -120,7 +120,7 @@ class HomePageUIState extends State<HomePageUI> {
             return BottomNavigationBar(
               fixedColor: Colors.red,
               onTap: _bottomNavBarBloc.pickItem,
-              type: BottomNavigationBarType.shifting,
+              type: BottomNavigationBarType.fixed,
               currentIndex: snapshot.data.index,
               items: [
                 new BottomNavigationBarItem(
