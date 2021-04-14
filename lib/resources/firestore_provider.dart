@@ -5,7 +5,7 @@ import 'package:hildegundis_app/models/Fine.dart';
 import 'package:hildegundis_app/models/FormationPosition.dart';
 
 class FirestoreProvider {
-  Firestore _firestore = Firestore.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> uploadNewDate(Event toAdd) async {
     return await _firestore.collection("events").add({
@@ -19,10 +19,7 @@ class FirestoreProvider {
   }
 
   Future<void> deleteDate(DocumentSnapshot document) async {
-    return await _firestore
-        .collection('events')
-        .document(document.documentID)
-        .delete();
+    return await _firestore.collection('events').doc(document.id).delete();
   }
 
   Future<DocumentReference> addEvent(Event addedEvent) async {
@@ -59,8 +56,8 @@ class FirestoreProvider {
   Future<void> togglePayed(DocumentSnapshot snapshot) {
     return _firestore
         .collection("transactions")
-        .document(snapshot.documentID)
-        .updateData({'payed': !snapshot['payed']});
+        .doc(snapshot.id)
+        .update({'payed': !snapshot['payed']});
   }
 
   Stream<QuerySnapshot> getAllFinesForName(String name) {
@@ -74,15 +71,15 @@ class FirestoreProvider {
   Future<void> updatePosition(FormationPosition old, FormationPosition newPos) {
     return _firestore
         .collection('formation')
-        .document(old.documentID)
-        .updateData({'position': newPos.position});
+        .doc(old.documentID)
+        .update({'position': newPos.position});
   }
 
   Future<void> removePosition(FormationPosition old, FormationPosition newPos) {
     return _firestore
         .collection('formation')
-        .document(old.documentID)
-        .updateData({'position': -1});
+        .doc(old.documentID)
+        .update({'position': -1});
   }
 
   Future<QuerySnapshot> getAllPositions(int formation) {
@@ -90,14 +87,14 @@ class FirestoreProvider {
         .collection('formation')
         .where("formation", isEqualTo: formation)
         .orderBy('position')
-        .getDocuments();
+        .get();
   }
 
   Future<int> authenticateUser(String email, String password) async {
     try {
-      FirebaseUser user = await FirebaseAuth.instance
+      var user = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      print("Signed in: ${user.uid}");
+      //print("Signed in: ${user.uid}");
       return 1;
     } catch (e) {
       print("Error $e");
@@ -107,7 +104,7 @@ class FirestoreProvider {
 
   Future<bool> checkAuthenticated() async {
     try {
-      var user = await FirebaseAuth.instance.currentUser();
+      var user = await FirebaseAuth.instance.currentUser;
       print(user);
       bool loggedIn = user != null;
       print(loggedIn.toString() + " user state");
@@ -121,8 +118,8 @@ class FirestoreProvider {
   Future<void> registerUser(String email, String password) async {
     return _firestore
         .collection("users")
-        .document(email)
-        .setData({'email': email, 'password': password, 'admin': false});
+        .doc(email)
+        .set({'email': email, 'password': password, 'admin': false});
   }
 
   Future<void> logoutUser() async {

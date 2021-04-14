@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hildegundis_app/ui/FineUI.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hildegundis_app/ui/EventsUI.dart';
 import 'package:hildegundis_app/ui/FormationUI.dart';
@@ -19,11 +22,27 @@ class HomePageUI extends StatefulWidget {
   HomePageUIState createState() => new HomePageUIState();
 }
 
+class ReceivedNotification {
+  ReceivedNotification({
+    this.id,
+    this.title,
+    this.body,
+    this.payload,
+  });
+
+  final int id;
+  final String title;
+  final String body;
+  final String payload;
+}
+
 class HomePageUIState extends State<HomePageUI> {
   int _page = 0;
-  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       new FlutterLocalNotificationsPlugin();
+  final BehaviorSubject<ReceivedNotification>
+      didReceiveLocalNotificationSubject =
+      BehaviorSubject<ReceivedNotification>();
   BottomNavBarBloc _bottomNavBarBloc;
 
   @override
@@ -32,45 +51,75 @@ class HomePageUIState extends State<HomePageUI> {
     _bottomNavBarBloc = BottomNavBarBloc();
     var android = new AndroidInitializationSettings("@mipmap/ic_launcher");
     var ios = new IOSInitializationSettings();
-    var platform = new InitializationSettings(android, ios);
-    flutterLocalNotificationsPlugin.initialize(platform);
+    var platform = new InitializationSettings();
 
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) {
-        print("Foreground: $message");
-        showMessage(message);
-      },
-      onLaunch: (Map<String, dynamic> message) {
-        print('On launch $message');
-      },
-      onResume: (Map<String, dynamic> message) {
-        print('On resume $message');
-      },
-    );
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
 
-    _firebaseMessaging.subscribeToTopic('all');
+    /// Note: permissions aren't requested here just to demonstrate that can be
+    /// done later
+    final IOSInitializationSettings initializationSettingsIOS =
+        IOSInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+            onDidReceiveLocalNotification:
+                (int id, String title, String body, String payload) async {
+              didReceiveLocalNotificationSubject.add(ReceivedNotification(
+                  id: id, title: title, body: body, payload: payload));
+            });
+    const MacOSInitializationSettings initializationSettingsMacOS =
+        MacOSInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false);
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS,
+            macOS: initializationSettingsMacOS);
 
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print('Settings registred: $settings');
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = new RemoteNotification();
+      AndroidNotification android = message.notification?.android;
+      print("Foreground: $message");
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                "channelID", "ChannelName", "channelDescription",
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'launch_background',
+              ),
+            ));
+      }
     });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print("Message opened App: $message");
+    });
+
+    FirebaseMessaging.instance.subscribeToTopic('all');
+
+    FirebaseMessaging.instance.requestPermission(
+        announcement: true,
+        carPlay: true,
+        criticalAlert: true,
+        alert: true,
+        badge: true,
+        sound: true);
   }
 
   @override
   void dispose() {
     super.dispose();
     _bottomNavBarBloc.close();
-  }
-
-  showMessage(Map<String, dynamic> message) async {
-    var android = new AndroidNotificationDetails(
-        "channelID", "ChannelName", "channelDescription");
-    var ios = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android, ios);
-    await flutterLocalNotificationsPlugin.show(
-        0, "$message.title", "$message.body", platform);
   }
 
   @override

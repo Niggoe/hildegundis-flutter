@@ -9,8 +9,8 @@ class FineScreenBlocProvider extends InheritedWidget {
   bool updateShouldNotify(_) => true;
 
   static FineScreenBloc of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(FineScreenBlocProvider)
-            as FineScreenBlocProvider)
+    return (context
+            .dependOnInheritedWidgetOfExactType<FineScreenBlocProvider>())
         .bloc;
   }
 }

@@ -33,7 +33,6 @@ class _SongbookUIState extends State<SongbookUI> {
             ? Center(child: CircularProgressIndicator())
             : PDFViewer(
                 document: document,
-                tooltip: PDFViewerTooltip(first: "Liederbuch"),
               ),
       ),
     );

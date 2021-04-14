@@ -60,7 +60,7 @@ class _EventsUIState extends State<EventsUI> {
 
     return new ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      key: new ValueKey(document.documentID),
+      key: new ValueKey(document.id),
       leading: Container(
         padding: EdgeInsets.only(right: 12.0),
         decoration: new BoxDecoration(
@@ -102,7 +102,7 @@ class _EventsUIState extends State<EventsUI> {
   }
 
   Future addEventPressed() async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    User user = await FirebaseAuth.instance.currentUser;
     if (user != null) {
       var user_id = user.uid;
       if (!allowedUsers.contains(user_id)) {
@@ -145,7 +145,7 @@ class _EventsUIState extends State<EventsUI> {
   }
 
   Future handleLongPress(DocumentSnapshot document) async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    User user = await FirebaseAuth.instance.currentUser;
     if (user != null) {
       var user_id = user.uid;
       if (!allowedUsers.contains(user_id)) {
@@ -203,7 +203,7 @@ class _EventsUIState extends State<EventsUI> {
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const Text('Loading...');
             return new ListView.builder(
-              itemCount: snapshot.data.documents.length,
+              itemCount: snapshot.data.docs.length,
               itemBuilder: (context, index) =>
                   _makeCard(context, snapshot.data.documents[index]),
             );

@@ -9,7 +9,8 @@ class EventScreenBlocProvider extends InheritedWidget {
   bool updateShouldNotify(_) => true;
 
   static EventScreenBloc of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(EventScreenBlocProvider)
+    return (context
+                .dependOnInheritedWidgetOfExactType<EventScreenBlocProvider>()
             as EventScreenBlocProvider)
         .bloc;
   }

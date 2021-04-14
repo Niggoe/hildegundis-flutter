@@ -9,8 +9,8 @@ class FormationUIBlocProvider extends InheritedWidget {
   bool updateShouldNotify(_) => true;
 
   static FormationUIBloc of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(FormationUIBlocProvider)
-            as FormationUIBlocProvider)
+    return (context
+            .dependOnInheritedWidgetOfExactType<FormationUIBlocProvider>())
         .bloc;
   }
 }

@@ -27,16 +27,6 @@ class FineUIState extends State<FineUI> {
   FineScreenBloc _bloc;
 
   Widget _makeCard(BuildContext context, DocumentSnapshot document) {
-    Fine currentStrafe = new Fine();
-    currentStrafe.date = document["date"] == '' ? null : document["date"];
-    currentStrafe.name = document['name'];
-    currentStrafe.reason = document["reason"];
-    if (document["amount"].runtimeType == int) {
-      currentStrafe.amount = document["amount"].toDouble();
-    } else {
-      currentStrafe.amount = document["amount"];
-    }
-
     return new Card(
       elevation: 8.0,
       shape: RoundedRectangleBorder(
@@ -53,7 +43,7 @@ class FineUIState extends State<FineUI> {
   }
 
   Future<bool> checkAllowedUser() async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    User user = await FirebaseAuth.instance.currentUser;
     if (user != null) {
       var user_id = user.uid;
       if (!allowedUsers.contains(user_id)) {
@@ -102,13 +92,13 @@ class FineUIState extends State<FineUI> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     var formatter = new DateFormat("dd.MM.yyyy");
-    var date = document['date'];
+    var date = document['date'].toDate();
     var datestring = formatter.format(date);
     bool payed = document['payed'];
 
     return new ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      key: new ValueKey(document.documentID),
+      key: new ValueKey(document.id),
       leading: Container(
         padding: EdgeInsets.only(right: 12.0),
         decoration: new BoxDecoration(
@@ -170,12 +160,10 @@ class FineUIState extends State<FineUI> {
     }
   }
 
-  void getDocuments(nameKey){
+  void getDocuments(nameKey) {
     var route = new MaterialPageRoute(
         builder: (BuildContext context) => new FineScreenBlocProvider(
-              child: FineDetailUI(
-                name: nameKey
-              ),
+              child: FineDetailUI(name: nameKey),
             ));
     Navigator.of(context).push(route);
   }
@@ -202,9 +190,9 @@ class FineUIState extends State<FineUI> {
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const Text('Loading...');
             return new ListView.builder(
-              itemCount: snapshot.data.documents.length,
+              itemCount: snapshot.data.docs.length,
               itemBuilder: (context, index) =>
-                  _makeCard(context, snapshot.data.documents[index]),
+                  _makeCard(context, snapshot.data.docs[index]),
             );
           }),
     );

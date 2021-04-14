@@ -67,19 +67,19 @@ class FormationUIState extends State<FormationUI> {
   }
 
   Future<QuerySnapshot> getDocuments(formation) async {
-    QuerySnapshot snapshot = await Firestore.instance
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('formation')
         .where("formation", isEqualTo: formation)
         .orderBy('position')
-        .getDocuments();
-    List<DocumentSnapshot> listOfDocuments = snapshot.documents;
+        .get();
+    List<DocumentSnapshot> listOfDocuments = snapshot.docs;
     int unassignedPositon = 0;
     for (DocumentSnapshot current in listOfDocuments) {
       FormationPosition currentPosition = new FormationPosition.empty();
       currentPosition.formation = current["formation"];
       currentPosition.name = current["name"];
       currentPosition.position = current["position"];
-      currentPosition.documentID = current.documentID;
+      currentPosition.documentID = current.id;
       if (currentPosition.position < 0) {
         currentPosition.position = currentPosition.position - unassignedPositon;
         unassignedPositon += 1;
@@ -177,7 +177,7 @@ class FormationUIState extends State<FormationUI> {
   }
 
   Future checkUserId() async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    User user = await FirebaseAuth.instance.currentUser;
     if (user != null) {
       var user_id = user.uid;
       print(user_id);
